@@ -31,3 +31,22 @@ import "@/events/shard/shardResume.js";
 
 // Guild — permissions, member events...
 import "@/events/guild/applicationCommandPermissionsUpdate.js";
+
+// Channel — create, delete, update, pins, webhooks
+import "@/events/channel/channelCreate.js";
+import "@/events/channel/channelDelete.js";
+import "@/events/channel/channelUpdate.js";
+import "@/events/channel/channelPinsUpdate.js";
+import "@/events/channel/webhooksUpdate.js";
+
+// Role — create, delete, update
+import "@/events/role/roleCreate.js";
+import "@/events/role/roleDelete.js";
+import "@/events/role/roleUpdate.js";
+
+// Voice — state, effects, stage instances
+import "@/events/voice/voiceStateUpdate.js";
+import "@/events/voice/voiceChannelEffectSend.js";
+import "@/events/voice/stageInstanceCreate.js";
+import "@/events/voice/stageInstanceUpdate.js";
+import "@/events/voice/stageInstanceDelete.js";

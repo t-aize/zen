@@ -2,6 +2,8 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
+	blockQuote,
+	bold,
 	type Client,
 	Colors,
 	EmbedBuilder,
@@ -40,22 +42,30 @@ const buildEmbed = (client: Client, triggeredAt: Date, restLatency: number) => {
 		.addFields(
 			{
 				name: "🔌 WebSocket Gateway",
-				value: `>>> ${inlineCode("Ping:")} **${wsLatency}ms**\n${inlineCode("Status:")} ${latencyBar(wsLatency)}`,
+				value: blockQuote(
+					`${inlineCode("Ping:")} ${bold(`${wsLatency}ms`)}\n${inlineCode("Status:")} ${latencyBar(wsLatency)}`,
+				),
 				inline: true,
 			},
 			{
 				name: "🌐 REST API",
-				value: `>>> ${inlineCode("Round-trip:")} **${restLatency}ms**\n${inlineCode("Status:")} ${latencyBar(restLatency)}`,
+				value: blockQuote(
+					`${inlineCode("Round-trip:")} ${bold(`${restLatency}ms`)}\n${inlineCode("Status:")} ${latencyBar(restLatency)}`,
+				),
 				inline: true,
 			},
 			{
 				name: "🤖 Bot",
-				value: `>>> ${inlineCode("Uptime:")} **${Math.floor(process.uptime() / 60)}m ${Math.floor(process.uptime() % 60)}s**\n${inlineCode("Heap:")} **${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)} MB**`,
+				value: blockQuote(
+					`${inlineCode("Uptime:")} ${bold(`${Math.floor(process.uptime() / 60)}m ${Math.floor(process.uptime() % 60)}s`)}\n${inlineCode("Heap:")} ${bold(`${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)} MB`)}`,
+				),
 				inline: true,
 			},
 			{
 				name: "🕐 Timestamp",
-				value: `>>> ${inlineCode("Measured:")} ${time(triggeredAt, TimestampStyles.FullDateShortTime)} (${time(triggeredAt, TimestampStyles.RelativeTime)})`,
+				value: blockQuote(
+					`${inlineCode("Measured:")} ${time(triggeredAt, TimestampStyles.FullDateShortTime)} (${time(triggeredAt, TimestampStyles.RelativeTime)})`,
+				),
 				inline: false,
 			},
 		)

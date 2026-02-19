@@ -1,4 +1,4 @@
-import type { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import type { AutocompleteInteraction, ChatInputCommandInteraction, SharedSlashCommand } from "discord.js";
 import { Collection } from "discord.js";
 import { createLogger } from "@/utils/logger.js";
 
@@ -10,7 +10,7 @@ const log = createLogger("commands");
  */
 export interface Command {
 	/** Builder instance that describes the command to Discord's API. */
-	data: SlashCommandBuilder;
+	data: SharedSlashCommand;
 
 	/**
 	 * Handler called by the interaction router when a user invokes this command.
@@ -18,6 +18,12 @@ export interface Command {
 	 * uniformly by the caller.
 	 */
 	execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+
+	/**
+	 * Optional autocomplete handler. When defined, the interaction router will
+	 * call this instead of a hardcoded per-command branch.
+	 */
+	autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
 }
 
 /**

@@ -568,7 +568,7 @@
     </routine>
     <schema id="214" parent="1" name="main">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2026-02-19.19:13:31</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-02-19.21:06:38</LastIntrospectionLocalTimestamp>
     </schema>
     <argument id="215" parent="14">
       <ArgumentDirection>R</ArgumentDirection>
@@ -1806,54 +1806,160 @@
     <argument id="626" parent="213">
       <Position>1</Position>
     </argument>
-    <table id="627" parent="214" name="guilds"/>
-    <table id="628" parent="214" name="sqlite_master">
+    <table id="627" parent="214" name="audit_log_config"/>
+    <table id="628" parent="214" name="guilds"/>
+    <table id="629" parent="214" name="sqlite_master">
       <System>1</System>
     </table>
-    <column id="629" parent="627" name="id">
+    <table id="630" parent="214" name="sqlite_sequence">
+      <System>1</System>
+    </table>
+    <table id="631" parent="214" name="warnings"/>
+    <column id="632" parent="627" name="id">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>text|0s</StoredType>
     </column>
-    <column id="630" parent="627" name="name">
+    <column id="633" parent="627" name="guild_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>text|0s</StoredType>
     </column>
-    <column id="631" parent="627" name="joined_at">
+    <column id="634" parent="627" name="category">
       <NotNull>1</NotNull>
       <Position>3</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="635" parent="627" name="channel_id">
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="636" parent="627" name="enabled">
+      <DefaultExpression>true</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
       <StoredType>integer|0s</StoredType>
     </column>
-    <index id="632" parent="627" name="sqlite_autoindex_guilds_1">
+    <column id="637" parent="627" name="created_at">
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>integer|0s</StoredType>
+    </column>
+    <column id="638" parent="627" name="updated_at">
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>integer|0s</StoredType>
+    </column>
+    <index id="639" parent="627" name="sqlite_autoindex_audit_log_config_1">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Unique>1</Unique>
     </index>
-    <key id="633" parent="627">
+    <index id="640" parent="627" name="audit_log_config_guild_category_idx">
+      <ColNames>guild_id
+category</ColNames>
+    </index>
+    <key id="641" parent="627">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_audit_log_config_1</UnderlyingIndexName>
+    </key>
+    <column id="642" parent="628" name="id">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="643" parent="628" name="name">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="644" parent="628" name="joined_at">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>integer|0s</StoredType>
+    </column>
+    <index id="645" parent="628" name="sqlite_autoindex_guilds_1">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <Unique>1</Unique>
+    </index>
+    <key id="646" parent="628">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>sqlite_autoindex_guilds_1</UnderlyingIndexName>
     </key>
-    <column id="634" parent="628" name="type">
+    <column id="647" parent="629" name="type">
       <Position>1</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="635" parent="628" name="name">
+    <column id="648" parent="629" name="name">
       <Position>2</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="636" parent="628" name="tbl_name">
+    <column id="649" parent="629" name="tbl_name">
       <Position>3</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="637" parent="628" name="rootpage">
+    <column id="650" parent="629" name="rootpage">
       <Position>4</Position>
       <StoredType>INT|0s</StoredType>
     </column>
-    <column id="638" parent="628" name="sql">
+    <column id="651" parent="629" name="sql">
       <Position>5</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
+    <column id="652" parent="630" name="name">
+      <Position>1</Position>
+    </column>
+    <column id="653" parent="630" name="seq">
+      <Position>2</Position>
+    </column>
+    <column id="654" parent="631" name="id">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="655" parent="631" name="guild_id">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="656" parent="631" name="user_id">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="657" parent="631" name="moderator_id">
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="658" parent="631" name="moderator_tag">
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="659" parent="631" name="reason">
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="660" parent="631" name="created_at">
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>integer|0s</StoredType>
+    </column>
+    <index id="661" parent="631" name="sqlite_autoindex_warnings_1">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <Unique>1</Unique>
+    </index>
+    <key id="662" parent="631">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_warnings_1</UnderlyingIndexName>
+    </key>
   </database-model>
 </dataSource>

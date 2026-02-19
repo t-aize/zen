@@ -2,8 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="db8f33dd-c289-4b2e-a6df-fb982001b312" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/905bb40a-3bc0-40f8-a7fc-e09608caae30.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/905bb40a-3bc0-40f8-a7fc-e09608caae30.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.release-it.json" beforeDir="false" afterPath="$PROJECT_DIR$/.release-it.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0000_snapshot.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/0000_snapshot.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/_journal.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/registry.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/registry.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/utility/ping.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/utility/ping.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/schema/guilds.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/guilds.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/schema/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/interactionCreate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/interactionCreate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/registry.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/registry.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,6 +90,7 @@
     "npm.db:migrate.executor": "Run",
     "npm.db:push.executor": "Run",
     "npm.dev.executor": "Run",
+    "npm.type-check.executor": "Run",
     "rearrange.code.on.save": "true",
     "settings.editor.selected.configurable": "preferences.keymap",
     "ts.external.directory.path": "C:\\Users\\minec\\IdeaProjects\\zen\\node_modules\\typescript\\lib",
@@ -88,7 +102,7 @@
       <recent name="C:\Users\minec\IdeaProjects\zen" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="npm.check">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -99,21 +113,11 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="db:generate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="check" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
-        <script value="db:generate" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
-      <method v="2" />
-    </configuration>
-    <configuration name="db:migrate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="db:migrate" />
+        <script value="check" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -139,13 +143,23 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="type-check" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="type-check" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.check" />
         <item itemvalue="npm.dev" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.db:push" />
-        <item itemvalue="npm.db:migrate" />
-        <item itemvalue="npm.db:generate" />
+        <item itemvalue="npm.type-check" />
       </list>
     </recent_temporary>
   </component>

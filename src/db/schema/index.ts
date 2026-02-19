@@ -4,4 +4,7 @@
  *
  * Add a new export here whenever you create a new table file.
  */
+
+export * from "@/db/schema/auditLogConfig.js";
 export * from "@/db/schema/guilds.js";
+export * from "@/db/schema/warnings.js";
