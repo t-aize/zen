@@ -1,6 +1,6 @@
 {
 	"name": "zen",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"private": true,
 	"description": "Zen — Simply powerful, purely open-source. The ultimate multipurpose Discord bot.",
 	"type": "module",
