@@ -8,7 +8,6 @@ import {
 	TimestampStyles,
 	time,
 	userMention,
-	type VoiceChannelEffect,
 } from "discord.js";
 import { defineEvent } from "@/events/index.js";
 import { getAuditLogChannel } from "@/utils/auditLog.js";
@@ -19,7 +18,7 @@ const log = createLogger("event:voiceChannelEffectSend");
 defineEvent({
 	name: "voiceChannelEffectSend",
 	once: false,
-	execute: async (effect: VoiceChannelEffect) => {
+	execute: async (effect) => {
 		const channel = effect.channel;
 		if (!channel) return;
 

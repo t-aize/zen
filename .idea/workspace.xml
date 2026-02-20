@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="db8f33dd-c289-4b2e-a6df-fb982001b312" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/905bb40a-3bc0-40f8-a7fc-e09608caae30.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/905bb40a-3bc0-40f8-a7fc-e09608caae30.xml" afterDir="false" />
+    <list default="true" id="db8f33dd-c289-4b2e-a6df-fb982001b312" name="Changes" comment="feat: add warnings and audit log configuration tables with corresponding exports">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.release-it.json" beforeDir="false" afterPath="$PROJECT_DIR$/.release-it.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0000_snapshot.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/0000_snapshot.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/_journal.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/registry.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/registry.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/utility/ping.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/utility/ping.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/guilds.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/guilds.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/interaction/interactionCreate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/interactionCreate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/config/auditlog.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/config/auditlog.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/ban.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/ban.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/kick.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/kick.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/mute.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/mute.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/nickname.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/nickname.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/purge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/purge.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/unban.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/unban.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/unmute.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/unmute.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/moderation/warn.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/moderation/warn.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/schema/auditLogConfig.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/auditLogConfig.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/schema/warnings.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/warnings.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/channel/channelCreate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/channel/channelCreate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/channel/channelDelete.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/channel/channelDelete.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/channel/channelPinsUpdate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/channel/channelPinsUpdate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/channel/channelUpdate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/channel/channelUpdate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/channel/webhooksUpdate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/channel/webhooksUpdate.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/events/registry.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/registry.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/role/roleCreate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/role/roleCreate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/role/roleDelete.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/role/roleDelete.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/role/roleUpdate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/role/roleUpdate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/voice/stageInstanceCreate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/voice/stageInstanceCreate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/voice/stageInstanceDelete.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/voice/stageInstanceDelete.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/voice/stageInstanceUpdate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/voice/stageInstanceUpdate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/voice/voiceChannelEffectSend.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/voice/voiceChannelEffectSend.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/voice/voiceStateUpdate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/voice/voiceStateUpdate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/logger.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/logger.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +66,10 @@
     &quot;accountId&quot;: &quot;e332da55-7c75-4768-a781-74dd924fc3f0&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="OptimizeOnSaveOptions">
     <option name="myRunOnSave" value="true" />
   </component>
@@ -90,6 +107,8 @@
     "npm.db:migrate.executor": "Run",
     "npm.db:push.executor": "Run",
     "npm.dev.executor": "Run",
+    "npm.release:patch.executor": "Run",
+    "npm.start.executor": "Run",
     "npm.type-check.executor": "Run",
     "rearrange.code.on.save": "true",
     "settings.editor.selected.configurable": "preferences.keymap",
@@ -102,7 +121,7 @@
       <recent name="C:\Users\minec\IdeaProjects\zen" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.check">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -123,16 +142,6 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="db:push" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="db:push" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
-      <method v="2" />
-    </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -143,11 +152,21 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="type-check" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="release:patch" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
-        <script value="type-check" />
+        <script value="release:patch" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -155,11 +174,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.check" />
         <item itemvalue="npm.dev" />
         <item itemvalue="npm.build" />
-        <item itemvalue="npm.db:push" />
-        <item itemvalue="npm.type-check" />
+        <item itemvalue="npm.check" />
+        <item itemvalue="npm.start" />
+        <item itemvalue="npm.release:patch" />
       </list>
     </recent_temporary>
   </component>
@@ -182,11 +201,27 @@
       <workItem from="1771522529006" duration="51000" />
       <workItem from="1771522593766" duration="64000" />
       <workItem from="1771522672951" duration="6340000" />
+      <workItem from="1771575964912" duration="19000" />
+      <workItem from="1771577128962" duration="104000" />
+      <workItem from="1771578903188" duration="1744000" />
     </task>
+    <task id="LOCAL-00001" summary="feat: add warnings and audit log configuration tables with corresponding exports">
+      <option name="closed" value="true" />
+      <created>1771538278181</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1771538278181</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: add warnings and audit log configuration tables with corresponding exports" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add warnings and audit log configuration tables with corresponding exports" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1,14 +1,4 @@
-import {
-	blockQuote,
-	bold,
-	Colors,
-	channelMention,
-	EmbedBuilder,
-	inlineCode,
-	type TextBasedChannel,
-	TimestampStyles,
-	time,
-} from "discord.js";
+import { blockQuote, bold, Colors, channelMention, EmbedBuilder, inlineCode, TimestampStyles, time } from "discord.js";
 import { defineEvent } from "@/events/index.js";
 import { getAuditLogChannel } from "@/utils/auditLog.js";
 import { createLogger } from "@/utils/logger.js";
@@ -18,7 +8,7 @@ const log = createLogger("event:channelPinsUpdate");
 defineEvent({
 	name: "channelPinsUpdate",
 	once: false,
-	execute: async (channel: TextBasedChannel, pinDate: Date) => {
+	execute: async (channel, pinDate) => {
 		if (!("guild" in channel) || !channel.guild) return;
 
 		const logChannel = await getAuditLogChannel(channel.guild, "channel");

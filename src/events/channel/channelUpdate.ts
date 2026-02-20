@@ -5,7 +5,6 @@ import {
 	ChannelType,
 	Colors,
 	channelMention,
-	type DMChannel,
 	EmbedBuilder,
 	inlineCode,
 	type NonThreadGuildBasedChannel,
@@ -48,10 +47,7 @@ const diff = (label: string, before: unknown, after: unknown): string | null => 
 defineEvent({
 	name: "channelUpdate",
 	once: false,
-	execute: async (
-		oldChannel: DMChannel | NonThreadGuildBasedChannel,
-		newChannel: DMChannel | NonThreadGuildBasedChannel,
-	) => {
+	execute: async (oldChannel, newChannel) => {
 		if (!("guild" in newChannel)) return;
 
 		const logChannel = await getAuditLogChannel(newChannel.guild, "channel");

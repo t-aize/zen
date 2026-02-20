@@ -31,7 +31,7 @@ const resolveAction = (oldState: VoiceState, newState: VoiceState): { title: str
 defineEvent({
 	name: "voiceStateUpdate",
 	once: false,
-	execute: async (oldState: VoiceState, newState: VoiceState) => {
+	execute: async (oldState, newState) => {
 		const logChannel = await getAuditLogChannel(newState.guild, "voice");
 		if (!logChannel) return;
 

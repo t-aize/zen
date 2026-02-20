@@ -6,7 +6,6 @@ import {
 	channelMention,
 	EmbedBuilder,
 	inlineCode,
-	type StageInstance,
 	strikethrough,
 	TimestampStyles,
 	time,
@@ -25,7 +24,7 @@ const PRIVACY_LABEL: Record<number, string> = {
 defineEvent({
 	name: "stageInstanceUpdate",
 	once: false,
-	execute: async (oldStage: StageInstance | null, newStage: StageInstance) => {
+	execute: async (oldStage, newStage) => {
 		if (!newStage.guild) return;
 
 		const logChannel = await getAuditLogChannel(newStage.guild, "voice");

@@ -1,11 +1,9 @@
 import {
 	ActionRowBuilder,
-	type AutocompleteInteraction,
 	ButtonBuilder,
 	ButtonStyle,
 	blockQuote,
 	bold,
-	type ChatInputCommandInteraction,
 	Colors,
 	EmbedBuilder,
 	inlineCode,
@@ -146,7 +144,7 @@ defineCommand({
 				.setRequired(false),
 		),
 
-	autocomplete: async (interaction: AutocompleteInteraction) => {
+	autocomplete: async (interaction) => {
 		if (!interaction.inCachedGuild()) {
 			await interaction.respond([]);
 			return;
@@ -175,7 +173,7 @@ defineCommand({
 		}
 	},
 
-	execute: async (interaction: ChatInputCommandInteraction) => {
+	execute: async (interaction) => {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
 				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),

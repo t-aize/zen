@@ -6,7 +6,6 @@ import {
 	channelMention,
 	EmbedBuilder,
 	inlineCode,
-	type StageInstance,
 	TimestampStyles,
 	time,
 } from "discord.js";
@@ -24,7 +23,7 @@ const PRIVACY_LABEL: Record<number, string> = {
 defineEvent({
 	name: "stageInstanceDelete",
 	once: false,
-	execute: async (stageInstance: StageInstance) => {
+	execute: async (stageInstance) => {
 		if (!stageInstance.guild) return;
 
 		const logChannel = await getAuditLogChannel(stageInstance.guild, "voice");

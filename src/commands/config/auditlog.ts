@@ -1,7 +1,6 @@
 import {
 	blockQuote,
 	bold,
-	type ChatInputCommandInteraction,
 	Colors,
 	channelMention,
 	EmbedBuilder,
@@ -95,7 +94,7 @@ defineCommand({
 			sub.setName("status").setDescription("View the current audit log configuration for this server."),
 		),
 
-	execute: async (interaction: ChatInputCommandInteraction) => {
+	execute: async (interaction) => {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
 				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),

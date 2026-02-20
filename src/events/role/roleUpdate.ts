@@ -36,7 +36,7 @@ const formatPermDiff = (oldRole: Role, newRole: Role): string[] => {
 defineEvent({
 	name: "roleUpdate",
 	once: false,
-	execute: async (oldRole: Role, newRole: Role) => {
+	execute: async (oldRole, newRole) => {
 		const logChannel = await getAuditLogChannel(newRole.guild, "role");
 		if (!logChannel) return;
 

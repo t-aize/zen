@@ -7,7 +7,6 @@ import {
 	channelMention,
 	EmbedBuilder,
 	inlineCode,
-	type NonThreadGuildBasedChannel,
 	PermissionsBitField,
 	roleMention,
 	TimestampStyles,
@@ -42,7 +41,7 @@ const formatRegion = (region: string | null): string => region ?? "Automatic";
 defineEvent({
 	name: "channelCreate",
 	once: false,
-	execute: async (channel: NonThreadGuildBasedChannel) => {
+	execute: async (channel) => {
 		const logChannel = await getAuditLogChannel(channel.guild, "channel");
 		if (!logChannel) return;
 

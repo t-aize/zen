@@ -1,5 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+// @ts-expect-error - TODO: Drizzle use CJS export, but we want to keep using ESM imports in our codebase
+import { guilds } from "./guilds";
 
 /**
  * Audit log categories — each maps to a group of Discord gateway events.
@@ -67,7 +69,9 @@ export const auditLogConfig = sqliteTable(
 			.$defaultFn(() => createId()),
 
 		/** Discord guild (server) snowflake ID. */
-		guildId: text("guild_id").notNull(),
+		guildId: text("guild_id")
+			.notNull()
+			.references(() => guilds.id, { onDelete: "cascade" }),
 
 		/**
 		 * Log category — one of the values in `AUDIT_LOG_CATEGORIES`.

@@ -4,7 +4,6 @@ import {
 	ButtonStyle,
 	blockQuote,
 	bold,
-	type ChatInputCommandInteraction,
 	Colors,
 	EmbedBuilder,
 	type GuildMember,
@@ -129,7 +128,7 @@ defineCommand({
 				),
 		),
 
-	execute: async (interaction: ChatInputCommandInteraction) => {
+	execute: async (interaction) => {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
 				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),

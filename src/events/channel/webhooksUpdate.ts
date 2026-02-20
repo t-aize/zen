@@ -1,18 +1,4 @@
-import {
-	blockQuote,
-	bold,
-	Colors,
-	channelMention,
-	EmbedBuilder,
-	type ForumChannel,
-	inlineCode,
-	type MediaChannel,
-	type NewsChannel,
-	type TextChannel,
-	TimestampStyles,
-	time,
-	type VoiceChannel,
-} from "discord.js";
+import { blockQuote, bold, Colors, channelMention, EmbedBuilder, inlineCode, TimestampStyles, time } from "discord.js";
 import { defineEvent } from "@/events/index.js";
 import { getAuditLogChannel } from "@/utils/auditLog.js";
 import { createLogger } from "@/utils/logger.js";
@@ -22,7 +8,7 @@ const log = createLogger("event:webhooksUpdate");
 defineEvent({
 	name: "webhooksUpdate",
 	once: false,
-	execute: async (channel: TextChannel | NewsChannel | VoiceChannel | ForumChannel | MediaChannel) => {
+	execute: async (channel) => {
 		const logChannel = await getAuditLogChannel(channel.guild, "channel");
 		if (!logChannel) return;
 

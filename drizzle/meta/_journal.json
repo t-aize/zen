@@ -29,6 +29,13 @@
 			"when": 1771534663552,
 			"tag": "0003_parallel_siren",
 			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "6",
+			"when": 1771579348947,
+			"tag": "0004_small_proteus",
+			"breakpoints": true
 		}
 	]
 }

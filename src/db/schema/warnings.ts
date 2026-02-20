@@ -1,5 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+// @ts-expect-error - TODO: Drizzle use CJS export, but we want to keep using ESM imports in our codebase
+import { guilds } from "./guilds";
 
 export const warnings = sqliteTable("warnings", {
 	/** Collision-resistant unique ID (cuid2) — used to reference a specific warning. */
@@ -8,7 +10,9 @@ export const warnings = sqliteTable("warnings", {
 		.$defaultFn(() => createId()),
 
 	/** Guild (server) snowflake ID this warning belongs to. */
-	guildId: text("guild_id").notNull(),
+	guildId: text("guild_id")
+		.notNull()
+		.references(() => guilds.id, { onDelete: "cascade" }),
 
 	/** Discord user snowflake ID of the warned member. */
 	userId: text("user_id").notNull(),

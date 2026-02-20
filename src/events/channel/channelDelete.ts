@@ -4,10 +4,8 @@ import {
 	bold,
 	ChannelType,
 	Colors,
-	type DMChannel,
 	EmbedBuilder,
 	inlineCode,
-	type NonThreadGuildBasedChannel,
 	PermissionsBitField,
 	roleMention,
 	TimestampStyles,
@@ -40,7 +38,7 @@ const formatBitrate = (bps: number): string => {
 defineEvent({
 	name: "channelDelete",
 	once: false,
-	execute: async (channel: DMChannel | NonThreadGuildBasedChannel) => {
+	execute: async (channel) => {
 		if (!("guild" in channel)) return;
 
 		const logChannel = await getAuditLogChannel(channel.guild, "channel");

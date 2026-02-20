@@ -24,7 +24,7 @@ const formatPermissions = (role: Role): string => {
 defineEvent({
 	name: "roleDelete",
 	once: false,
-	execute: async (role: Role) => {
+	execute: async (role) => {
 		const logChannel = await getAuditLogChannel(role.guild, "role");
 		if (!logChannel) return;
 
