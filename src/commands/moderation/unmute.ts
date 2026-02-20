@@ -3,60 +3,36 @@ import {
 	bold,
 	Colors,
 	EmbedBuilder,
-	type GuildMember,
-	inlineCode,
-	MessageFlags,
 	PermissionFlagsBits,
 	SlashCommandBuilder,
 	userMention,
 } from "discord.js";
 import { defineCommand } from "@/commands/index.js";
 import { createLogger } from "@/utils/logger.js";
+import {
+	ensureGuild,
+	executorFieldWithDuration,
+	getBlockReason,
+	reasonField,
+	replyActionBlocked,
+	replyMemberNotFound,
+	targetField,
+} from "@/utils/moderation.js";
 
 const log = createLogger("unmute");
 
-const getUnmuteBlockReason = (executor: GuildMember, target: GuildMember, me: GuildMember): string | null => {
-	if (!target.moderatable) return "I don't have permission to manage this member's timeout.";
-	if (target.id === executor.id) return "You cannot unmute yourself.";
-	if (target.id === me.id) return "I cannot unmute myself.";
-	if (target.roles.highest.position >= executor.roles.highest.position)
-		return "You cannot unmute a member with an equal or higher role than yours.";
-	return null;
-};
-
-const buildResultEmbed = (target: GuildMember, reason: string, executor: GuildMember, startedAt: Date) =>
+const buildResultEmbed = (
+	target: import("discord.js").GuildMember,
+	reason: string,
+	executor: import("discord.js").GuildMember,
+	startedAt: Date,
+) =>
 	new EmbedBuilder()
 		.setTitle("✅ Member Unmuted")
 		.setDescription(`${userMention(target.id)} has been removed from timeout.`)
 		.setThumbnail(target.displayAvatarURL())
 		.setColor(Colors.Green)
-		.addFields(
-			{
-				name: "🎯 Target",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")} ${bold(target.user.tag)}`,
-						`${inlineCode("ID:")}   ${inlineCode(target.id)}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
-			{
-				name: "🛡️ Executor",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")}     ${bold(executor.user.tag)}`,
-						`${inlineCode("Duration:")} ${bold(`${Date.now() - startedAt.getTime()}ms`)}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
-			{
-				name: "📝 Reason",
-				value: blockQuote(bold(reason)),
-				inline: false,
-			},
-		)
+		.addFields(targetField(target), executorFieldWithDuration(executor.user, startedAt), reasonField(reason))
 		.setFooter({ text: "Zen • Moderation" })
 		.setTimestamp();
 
@@ -76,15 +52,10 @@ defineCommand({
 		),
 
 	execute: async (interaction) => {
-		if (!interaction.inCachedGuild()) {
-			await interaction.reply({
-				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),
-				flags: MessageFlags.Ephemeral,
-			});
-			return;
-		}
+		if (!(await ensureGuild(interaction))) return;
+		if (!interaction.inCachedGuild()) return;
 
-		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+		await interaction.deferReply({ flags: 64 });
 
 		const targetUser = interaction.options.getUser("user", true);
 		const reason = interaction.options.getString("reason") ?? "No reason provided.";
@@ -94,11 +65,7 @@ defineCommand({
 		const target = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
 
 		if (!target) {
-			await interaction.editReply({
-				content: blockQuote(
-					`⛔ ${bold("Member not found")} — ${userMention(targetUser.id)} (${inlineCode(targetUser.id)}) is not in this server.`,
-				),
-			});
+			await replyMemberNotFound(interaction, targetUser.id);
 			return;
 		}
 
@@ -113,12 +80,14 @@ defineCommand({
 			return;
 		}
 
-		const blockReason = getUnmuteBlockReason(executor, target, me);
+		const blockReason = getBlockReason(executor, target, me, {
+			permissionCheck: target.moderatable,
+			noPermissionMessage: "I don't have permission to manage this member's timeout.",
+			action: "unmute",
+		});
 
 		if (blockReason) {
-			await interaction.editReply({
-				content: blockQuote(`⛔ ${bold("Action blocked")} — ${blockReason}`),
-			});
+			await replyActionBlocked(interaction, blockReason);
 			return;
 		}
 

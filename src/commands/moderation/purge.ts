@@ -1,7 +1,4 @@
 import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
 	blockQuote,
 	bold,
 	type Collection,
@@ -10,26 +7,29 @@ import {
 	type GuildTextBasedChannel,
 	inlineCode,
 	type Message,
-	MessageFlags,
 	PermissionFlagsBits,
 	SlashCommandBuilder,
 	type Snowflake,
-	TimestampStyles,
-	time,
 	userMention,
 } from "discord.js";
 import { defineCommand } from "@/commands/index.js";
 import { createLogger } from "@/utils/logger.js";
+import {
+	buildConfirmRow,
+	createConfirmationCollector,
+	ensureGuild,
+	executorFieldWithDuration,
+	pluralise,
+	requestedAtField,
+} from "@/utils/moderation.js";
 
-const PURGE_CONFIRM_ID = "purge:confirm";
-const PURGE_CANCEL_ID = "purge:cancel";
+const CONFIRM_ID = "purge:confirm";
+const CANCEL_ID = "purge:cancel";
 
 const MAX_BULK_AGE_MS = 14 * 24 * 60 * 60 * 1_000;
 const FETCH_BATCH = 100;
 
 const log = createLogger("purge");
-
-const pluralise = (n: number, word: string) => `${bold(String(n))} ${word}${n !== 1 ? "s" : ""}`;
 
 const buildPreviewEmbed = (
 	target: { tag: string; id: string; avatarURL: string | null },
@@ -70,13 +70,7 @@ const buildPreviewEmbed = (
 				),
 				inline: true,
 			},
-			{
-				name: "🕐 Requested At",
-				value: blockQuote(
-					`${time(new Date(), TimestampStyles.FullDateShortTime)} (${time(new Date(), TimestampStyles.RelativeTime)})`,
-				),
-				inline: true,
-			},
+			requestedAtField(),
 		)
 		.setFooter({ text: "Zen • Moderation — Confirm or cancel below" })
 		.setTimestamp();
@@ -112,36 +106,11 @@ const buildResultEmbed = (
 				),
 				inline: true,
 			},
-			{
-				name: "🛡️ Executor",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")}     ${bold(executor.tag)}`,
-						`${inlineCode("Duration:")} ${bold(`${Date.now() - startedAt.getTime()}ms`)}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
+			executorFieldWithDuration(executor, startedAt),
 		)
 		.setFooter({ text: "Zen • Moderation" })
 		.setTimestamp();
 };
-
-const buildConfirmRow = (disabled = false) =>
-	new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setCustomId(PURGE_CONFIRM_ID)
-			.setLabel("Confirm Purge")
-			.setEmoji("🗑️")
-			.setStyle(ButtonStyle.Danger)
-			.setDisabled(disabled),
-		new ButtonBuilder()
-			.setCustomId(PURGE_CANCEL_ID)
-			.setLabel("Cancel")
-			.setEmoji("✖️")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(disabled),
-	);
 
 /**
  * Fetches up to `limit` messages from a single channel that belong to `userId`
@@ -201,15 +170,10 @@ defineCommand({
 		),
 
 	execute: async (interaction) => {
-		if (!interaction.inCachedGuild()) {
-			await interaction.reply({
-				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),
-				flags: MessageFlags.Ephemeral,
-			});
-			return;
-		}
+		if (!(await ensureGuild(interaction))) return;
+		if (!interaction.inCachedGuild()) return;
 
-		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+		await interaction.deferReply({ flags: 64 });
 
 		const targetUser = interaction.options.getUser("user", true);
 		const limit = interaction.options.getInteger("limit") ?? FETCH_BATCH;
@@ -231,7 +195,7 @@ defineCommand({
 			return;
 		}
 
-		const message = await interaction.editReply({
+		await interaction.editReply({
 			embeds: [
 				buildPreviewEmbed(
 					{
@@ -244,106 +208,72 @@ defineCommand({
 					{ tag: executor.user.tag, id: executor.id },
 				),
 			],
-			components: [buildConfirmRow()],
+			components: [buildConfirmRow(CONFIRM_ID, CANCEL_ID, "Confirm Purge", "🗑️")],
 		});
 
-		const collector = message.createMessageComponentCollector({
-			filter: (btn) => btn.user.id === interaction.user.id,
-			max: 1,
-			time: 30_000,
-		});
+		createConfirmationCollector({
+			interaction,
+			confirmId: CONFIRM_ID,
+			cancelId: CANCEL_ID,
+			cancelledAction: "purge",
+			timedOutMessage: "No messages were deleted.",
+			buildConfirmRowDisabled: () =>
+				buildConfirmRow(CONFIRM_ID, CANCEL_ID, "Confirm Purge", "🗑️", undefined, true),
+			onConfirm: async () => {
+				const startedAt = new Date();
+				let totalDeleted = 0;
+				let totalSkipped = 0;
+				let channelsAffected = 0;
 
-		collector.on("collect", async (btn) => {
-			await btn.deferUpdate();
+				for (const channel of textChannels.values()) {
+					try {
+						const [toDelete, skipped] = await collectFromChannel(channel, targetUser.id, limit);
+						totalSkipped += skipped;
 
-			if (btn.customId === PURGE_CANCEL_ID) {
-				await interaction.editReply({
-					embeds: [
-						new EmbedBuilder()
-							.setTitle("🚫 Cancelled")
-							.setDescription("The purge was cancelled. No messages were deleted.")
-							.setColor(Colors.Grey)
-							.setFooter({ text: "Zen • Moderation" })
-							.setTimestamp(),
-					],
-					components: [],
-				});
-				return;
-			}
+						if (toDelete.length === 0) continue;
 
-			const startedAt = new Date();
-			let totalDeleted = 0;
-			let totalSkipped = 0;
-			let channelsAffected = 0;
+						const result = await channel.bulkDelete(toDelete, true);
+						totalDeleted += result.size;
+						channelsAffected++;
 
-			for (const channel of textChannels.values()) {
-				try {
-					const [toDelete, skipped] = await collectFromChannel(channel, targetUser.id, limit);
-					totalSkipped += skipped;
-
-					if (toDelete.length === 0) continue;
-
-					const result = await channel.bulkDelete(toDelete, true);
-					totalDeleted += result.size;
-					channelsAffected++;
-
-					log.debug(
-						{ channelId: channel.id, deleted: result.size, targetId: targetUser.id },
-						`Purged ${result.size} messages in #${channel.name}`,
-					);
-				} catch (err) {
-					log.warn(
-						{ err, channelId: channel.id, targetId: targetUser.id },
-						`Failed to purge messages in channel ${channel.id}`,
-					);
+						log.debug(
+							{ channelId: channel.id, deleted: result.size, targetId: targetUser.id },
+							`Purged ${result.size} messages in #${channel.name}`,
+						);
+					} catch (err) {
+						log.warn(
+							{ err, channelId: channel.id, targetId: targetUser.id },
+							`Failed to purge messages in channel ${channel.id}`,
+						);
+					}
 				}
-			}
 
-			log.info(
-				{
-					targetId: targetUser.id,
-					executorId: executor.id,
-					totalDeleted,
-					totalSkipped,
-					channelsAffected,
-					durationMs: Date.now() - startedAt.getTime(),
-				},
-				`${executor.user.tag} purged ${totalDeleted} messages from ${targetUser.tag}`,
-			);
-
-			await interaction.editReply({
-				embeds: [
-					buildResultEmbed(
-						{ tag: targetUser.tag, id: targetUser.id },
+				log.info(
+					{
+						targetId: targetUser.id,
+						executorId: executor.id,
 						totalDeleted,
 						totalSkipped,
 						channelsAffected,
-						{ tag: executor.user.tag },
-						startedAt,
-					),
-				],
-				components: [],
-			});
-		});
+						durationMs: Date.now() - startedAt.getTime(),
+					},
+					`${executor.user.tag} purged ${totalDeleted} messages from ${targetUser.tag}`,
+				);
 
-		collector.on("end", async (_, reason) => {
-			if (reason === "time") {
-				await interaction
-					.editReply({
-						embeds: [
-							new EmbedBuilder()
-								.setTitle("⏱️ Timed Out")
-								.setDescription(
-									"The confirmation prompt expired after 30 seconds. No messages were deleted.",
-								)
-								.setColor(Colors.Grey)
-								.setFooter({ text: "Zen • Moderation" })
-								.setTimestamp(),
-						],
-						components: [buildConfirmRow(true)],
-					})
-					.catch(() => null);
-			}
+				await interaction.editReply({
+					embeds: [
+						buildResultEmbed(
+							{ tag: targetUser.tag, id: targetUser.id },
+							totalDeleted,
+							totalSkipped,
+							channelsAffected,
+							{ tag: executor.user.tag },
+							startedAt,
+						),
+					],
+					components: [],
+				});
+			},
 		});
 	},
 });

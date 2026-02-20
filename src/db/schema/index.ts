@@ -6,5 +6,8 @@
  */
 
 export * from "@/db/schema/auditLogConfig.js";
+export * from "@/db/schema/giveaways.js";
 export * from "@/db/schema/guilds.js";
+export * from "@/db/schema/notes.js";
+export * from "@/db/schema/tickets.js";
 export * from "@/db/schema/warnings.js";

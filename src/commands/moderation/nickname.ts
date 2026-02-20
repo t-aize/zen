@@ -5,7 +5,6 @@ import {
 	EmbedBuilder,
 	type GuildMember,
 	inlineCode,
-	MessageFlags,
 	PermissionFlagsBits,
 	SlashCommandBuilder,
 	TimestampStyles,
@@ -14,6 +13,7 @@ import {
 } from "discord.js";
 import { defineCommand } from "@/commands/index.js";
 import { createLogger } from "@/utils/logger.js";
+import { ensureGuild, executorFieldWithDuration, replyActionBlocked, replyMemberNotFound } from "@/utils/moderation.js";
 
 const log = createLogger("nickname");
 
@@ -54,16 +54,7 @@ const buildResultEmbed = (
 				),
 				inline: false,
 			},
-			{
-				name: "🛡️ Executor",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")}     ${bold(executor.user.tag)}`,
-						`${inlineCode("Duration:")} ${bold(`${Date.now() - startedAt.getTime()}ms`)}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
+			executorFieldWithDuration(executor.user, startedAt),
 			{
 				name: "🕐 Changed At",
 				value: blockQuote(
@@ -92,15 +83,10 @@ defineCommand({
 		),
 
 	execute: async (interaction) => {
-		if (!interaction.inCachedGuild()) {
-			await interaction.reply({
-				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),
-				flags: MessageFlags.Ephemeral,
-			});
-			return;
-		}
+		if (!(await ensureGuild(interaction))) return;
+		if (!interaction.inCachedGuild()) return;
 
-		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+		await interaction.deferReply({ flags: 64 });
 
 		const targetUser = interaction.options.getUser("user", true);
 		const newNick = interaction.options.getString("nickname") ?? null;
@@ -110,20 +96,14 @@ defineCommand({
 		const target = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
 
 		if (!target) {
-			await interaction.editReply({
-				content: blockQuote(
-					`⛔ ${bold("Member not found")} — ${userMention(targetUser.id)} (${inlineCode(targetUser.id)}) is not in this server.`,
-				),
-			});
+			await replyMemberNotFound(interaction, targetUser.id);
 			return;
 		}
 
 		const blockReason = getNicknameBlockReason(executor, target, me);
 
 		if (blockReason) {
-			await interaction.editReply({
-				content: blockQuote(`⛔ ${bold("Action blocked")} — ${blockReason}`),
-			});
+			await replyActionBlocked(interaction, blockReason);
 			return;
 		}
 

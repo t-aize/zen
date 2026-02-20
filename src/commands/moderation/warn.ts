@@ -1,14 +1,10 @@
 import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
 	blockQuote,
 	bold,
 	Colors,
 	EmbedBuilder,
 	type GuildMember,
 	inlineCode,
-	MessageFlags,
 	PermissionFlagsBits,
 	SlashCommandBuilder,
 	TimestampStyles,
@@ -20,6 +16,18 @@ import { defineCommand } from "@/commands/index.js";
 import { db } from "@/db/index.js";
 import { warnings } from "@/db/schema/index.js";
 import { createLogger } from "@/utils/logger.js";
+import {
+	buildConfirmRow,
+	createConfirmationCollector,
+	ensureGuild,
+	executorField,
+	executorFieldWithDuration,
+	reasonField,
+	replyActionBlocked,
+	replyMemberNotFound,
+	requestedAtField,
+	targetField,
+} from "@/utils/moderation.js";
 
 const WARN_ADD_CONFIRM_ID = "warn:add:confirm";
 const WARN_ADD_CANCEL_ID = "warn:add:cancel";
@@ -40,38 +48,6 @@ const getWarnBlockReason = (executor: GuildMember, target: GuildMember, me: Guil
 		return "You cannot warn a member with an equal or higher role than yours.";
 	return null;
 };
-
-const buildConfirmRow = (confirmId: string, cancelId: string, label: string, emoji: string, disabled = false) =>
-	new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setCustomId(confirmId)
-			.setLabel(label)
-			.setEmoji(emoji)
-			.setStyle(ButtonStyle.Danger)
-			.setDisabled(disabled),
-		new ButtonBuilder()
-			.setCustomId(cancelId)
-			.setLabel("Cancel")
-			.setEmoji("✖️")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(disabled),
-	);
-
-const buildCancelledEmbed = (action: string) =>
-	new EmbedBuilder()
-		.setTitle("🚫 Cancelled")
-		.setDescription(`The ${action} was cancelled. No action was taken.`)
-		.setColor(Colors.Grey)
-		.setFooter({ text: "Zen • Moderation" })
-		.setTimestamp();
-
-const buildTimedOutEmbed = (action: string) =>
-	new EmbedBuilder()
-		.setTitle("⏱️ Timed Out")
-		.setDescription(`The confirmation prompt expired after 30 seconds. The ${action} was not performed.`)
-		.setColor(Colors.Grey)
-		.setFooter({ text: "Zen • Moderation" })
-		.setTimestamp();
 
 defineCommand({
 	data: new SlashCommandBuilder()
@@ -129,18 +105,13 @@ defineCommand({
 		),
 
 	execute: async (interaction) => {
-		if (!interaction.inCachedGuild()) {
-			await interaction.reply({
-				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),
-				flags: MessageFlags.Ephemeral,
-			});
-			return;
-		}
+		if (!(await ensureGuild(interaction))) return;
+		if (!interaction.inCachedGuild()) return;
 
 		const sub = interaction.options.getSubcommand(true) as "add" | "list" | "remove" | "clear";
 
 		if (sub === "add") {
-			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+			await interaction.deferReply({ flags: 64 });
 
 			const targetUser = interaction.options.getUser("user", true);
 			const reason = interaction.options.getString("reason", true);
@@ -150,24 +121,18 @@ defineCommand({
 			const target = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
 
 			if (!target) {
-				await interaction.editReply({
-					content: blockQuote(
-						`⛔ ${bold("Member not found")} — ${userMention(targetUser.id)} (${inlineCode(targetUser.id)}) is not in this server.`,
-					),
-				});
+				await replyMemberNotFound(interaction, targetUser.id);
 				return;
 			}
 
 			const blockReason = getWarnBlockReason(executor, target, me);
 
 			if (blockReason) {
-				await interaction.editReply({
-					content: blockQuote(`⛔ ${bold("Action blocked")} — ${blockReason}`),
-				});
+				await replyActionBlocked(interaction, blockReason);
 				return;
 			}
 
-			const message = await interaction.editReply({
+			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle("⚠️ Issue Warning")
@@ -177,38 +142,10 @@ defineCommand({
 						.setThumbnail(target.displayAvatarURL())
 						.setColor(Colors.Yellow)
 						.addFields(
-							{
-								name: "🎯 Target",
-								value: blockQuote(
-									[
-										`${inlineCode("User:")} ${bold(target.user.tag)}`,
-										`${inlineCode("ID:")}   ${inlineCode(target.id)}`,
-									].join("\n"),
-								),
-								inline: true,
-							},
-							{
-								name: "🛡️ Executor",
-								value: blockQuote(
-									[
-										`${inlineCode("User:")} ${bold(executor.user.tag)}`,
-										`${inlineCode("ID:")}   ${inlineCode(executor.id)}`,
-									].join("\n"),
-								),
-								inline: true,
-							},
-							{
-								name: "📝 Reason",
-								value: blockQuote(bold(reason)),
-								inline: false,
-							},
-							{
-								name: "🕐 Requested At",
-								value: blockQuote(
-									`${time(new Date(), TimestampStyles.FullDateShortTime)} (${time(new Date(), TimestampStyles.RelativeTime)})`,
-								),
-								inline: false,
-							},
+							targetField(target),
+							executorField(executor),
+							reasonField(reason),
+							requestedAtField(),
 						)
 						.setFooter({ text: "Zen • Moderation — Confirm or cancel below" })
 						.setTimestamp(),
@@ -216,42 +153,54 @@ defineCommand({
 				components: [buildConfirmRow(WARN_ADD_CONFIRM_ID, WARN_ADD_CANCEL_ID, "Confirm Warn", "⚠️")],
 			});
 
-			const collector = message.createMessageComponentCollector({
-				filter: (btn) => btn.user.id === interaction.user.id,
-				max: 1,
-				time: 30_000,
-			});
+			createConfirmationCollector({
+				interaction,
+				confirmId: WARN_ADD_CONFIRM_ID,
+				cancelId: WARN_ADD_CANCEL_ID,
+				cancelledAction: "warning",
+				timedOutMessage: "The warning was not performed.",
+				buildConfirmRowDisabled: () =>
+					buildConfirmRow(WARN_ADD_CONFIRM_ID, WARN_ADD_CANCEL_ID, "Confirm Warn", "⚠️", undefined, true),
+				onConfirm: async () => {
+					const startedAt = new Date();
 
-			collector.on("collect", async (btn) => {
-				await btn.deferUpdate();
+					let warnId: string;
+					let totalWarnings: number;
 
-				if (btn.customId === WARN_ADD_CANCEL_ID) {
-					await interaction.editReply({ embeds: [buildCancelledEmbed("warning")], components: [] });
-					return;
-				}
+					try {
+						const result = await db
+							.insert(warnings)
+							.values({
+								guildId: interaction.guildId,
+								userId: target.id,
+								moderatorId: executor.id,
+								moderatorTag: executor.user.tag,
+								reason,
+								createdAt: startedAt,
+							})
+							.returning({ id: warnings.id });
 
-				const startedAt = new Date();
+						const inserted = result[0];
 
-				let warnId: string;
-				let totalWarnings: number;
+						if (!inserted) {
+							log.error({ targetId: target.id, executorId: executor.id }, "Insert returned no rows");
+							await interaction.editReply({
+								content: blockQuote(
+									`❌ ${bold("Failed")} — An unexpected error occurred while saving the warning.`,
+								),
+								components: [],
+							});
+							return;
+						}
 
-				try {
-					const result = await db
-						.insert(warnings)
-						.values({
-							guildId: interaction.guildId,
-							userId: target.id,
-							moderatorId: executor.id,
-							moderatorTag: executor.user.tag,
-							reason,
-							createdAt: startedAt,
-						})
-						.returning({ id: warnings.id });
+						warnId = inserted.id;
 
-					const inserted = result[0];
-
-					if (!inserted) {
-						log.error({ targetId: target.id, executorId: executor.id }, "Insert returned no rows");
+						const all = await db.query.warnings.findMany({
+							where: (w, { eq, and }) => and(eq(w.guildId, interaction.guildId), eq(w.userId, target.id)),
+						});
+						totalWarnings = all.length;
+					} catch (err) {
+						log.error({ err, targetId: target.id, executorId: executor.id }, "Failed to insert warning");
 						await interaction.editReply({
 							content: blockQuote(
 								`❌ ${bold("Failed")} — An unexpected error occurred while saving the warning.`,
@@ -261,112 +210,63 @@ defineCommand({
 						return;
 					}
 
-					warnId = inserted.id;
+					log.info(
+						{ warnId, targetId: target.id, executorId: executor.id, reason, totalWarnings },
+						`${executor.user.tag} warned ${target.user.tag} (warn #${warnId})`,
+					);
 
-					const all = await db.query.warnings.findMany({
-						where: (w, { eq, and }) => and(eq(w.guildId, interaction.guildId), eq(w.userId, target.id)),
-					});
-					totalWarnings = all.length;
-				} catch (err) {
-					log.error({ err, targetId: target.id, executorId: executor.id }, "Failed to insert warning");
+					try {
+						await target.send({
+							embeds: [
+								new EmbedBuilder()
+									.setTitle("⚠️ You have been warned")
+									.setDescription(`You received a warning in ${bold(interaction.guild.name)}.`)
+									.setColor(Colors.Yellow)
+									.addFields(reasonField(reason), {
+										name: "🪪 Warning ID",
+										value: blockQuote(`${inlineCode("ID:")} ${bold(String(warnId))}`),
+										inline: false,
+									})
+									.setFooter({ text: `${interaction.guild.name} • Moderation` })
+									.setTimestamp(),
+							],
+						});
+					} catch {
+						log.debug({ targetId: target.id }, "Could not DM warning to member (DMs likely closed)");
+					}
+
 					await interaction.editReply({
-						content: blockQuote(
-							`❌ ${bold("Failed")} — An unexpected error occurred while saving the warning.`,
-						),
-						components: [],
-					});
-					return;
-				}
-
-				log.info(
-					{ warnId, targetId: target.id, executorId: executor.id, reason, totalWarnings },
-					`${executor.user.tag} warned ${target.user.tag} (warn #${warnId})`,
-				);
-
-				try {
-					await target.send({
 						embeds: [
 							new EmbedBuilder()
-								.setTitle("⚠️ You have been warned")
-								.setDescription(`You received a warning in ${bold(interaction.guild.name)}.`)
-								.setColor(Colors.Yellow)
+								.setTitle("✅ Warning Issued")
+								.setDescription(`${userMention(target.id)} has been warned.`)
+								.setThumbnail(target.displayAvatarURL())
+								.setColor(Colors.Green)
 								.addFields(
-									{ name: "📝 Reason", value: blockQuote(bold(reason)), inline: false },
+									targetField(target, [
+										`${inlineCode("Warnings:")} ${bold(String(totalWarnings))} total on this server`,
+									]),
+									executorFieldWithDuration(executor.user, startedAt),
+									reasonField(reason),
 									{
 										name: "🪪 Warning ID",
 										value: blockQuote(`${inlineCode("ID:")} ${bold(String(warnId))}`),
 										inline: false,
 									},
 								)
-								.setFooter({ text: `${interaction.guild.name} • Moderation` })
+								.setFooter({ text: "Zen • Moderation" })
 								.setTimestamp(),
 						],
+						components: [],
 					});
-				} catch {
-					log.debug({ targetId: target.id }, "Could not DM warning to member (DMs likely closed)");
-				}
-
-				await interaction.editReply({
-					embeds: [
-						new EmbedBuilder()
-							.setTitle("✅ Warning Issued")
-							.setDescription(`${userMention(target.id)} has been warned.`)
-							.setThumbnail(target.displayAvatarURL())
-							.setColor(Colors.Green)
-							.addFields(
-								{
-									name: "🎯 Target",
-									value: blockQuote(
-										[
-											`${inlineCode("User:")}     ${bold(target.user.tag)}`,
-											`${inlineCode("ID:")}       ${inlineCode(target.id)}`,
-											`${inlineCode("Warnings:")} ${bold(String(totalWarnings))} total on this server`,
-										].join("\n"),
-									),
-									inline: true,
-								},
-								{
-									name: "🛡️ Executor",
-									value: blockQuote(
-										[
-											`${inlineCode("User:")}     ${bold(executor.user.tag)}`,
-											`${inlineCode("Duration:")} ${bold(`${Date.now() - startedAt.getTime()}ms`)}`,
-										].join("\n"),
-									),
-									inline: true,
-								},
-								{ name: "📝 Reason", value: blockQuote(bold(reason)), inline: false },
-								{
-									name: "🪪 Warning ID",
-									value: blockQuote(`${inlineCode("ID:")} ${bold(String(warnId))}`),
-									inline: false,
-								},
-							)
-							.setFooter({ text: "Zen • Moderation" })
-							.setTimestamp(),
-					],
-					components: [],
-				});
-			});
-
-			collector.on("end", async (_, reason) => {
-				if (reason === "time") {
-					await interaction
-						.editReply({
-							embeds: [buildTimedOutEmbed("warning")],
-							components: [
-								buildConfirmRow(WARN_ADD_CONFIRM_ID, WARN_ADD_CANCEL_ID, "Confirm Warn", "⚠️", true),
-							],
-						})
-						.catch(() => null);
-				}
+				},
 			});
 
 			return;
 		}
 
 		if (sub === "list") {
-			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+			await interaction.deferReply({ flags: 64 });
 
 			const targetUser = interaction.options.getUser("user", true);
 			const page = interaction.options.getInteger("page") ?? 1;
@@ -444,7 +344,7 @@ defineCommand({
 		}
 
 		if (sub === "remove") {
-			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+			await interaction.deferReply({ flags: 64 });
 
 			const warnId = interaction.options.getString("id", true);
 			const reason = interaction.options.getString("reason") ?? "No reason provided.";
@@ -473,7 +373,7 @@ defineCommand({
 				return;
 			}
 
-			const message = await interaction.editReply({
+			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle("🗑️ Remove Warning")
@@ -495,28 +395,9 @@ defineCommand({
 								),
 								inline: false,
 							},
-							{
-								name: "🛡️ Executor",
-								value: blockQuote(
-									[
-										`${inlineCode("User:")} ${bold(executor.user.tag)}`,
-										`${inlineCode("ID:")}   ${inlineCode(executor.id)}`,
-									].join("\n"),
-								),
-								inline: true,
-							},
-							{
-								name: "📝 Removal Reason",
-								value: blockQuote(bold(reason)),
-								inline: false,
-							},
-							{
-								name: "🕐 Requested At",
-								value: blockQuote(
-									`${time(new Date(), TimestampStyles.FullDateShortTime)} (${time(new Date(), TimestampStyles.RelativeTime)})`,
-								),
-								inline: false,
-							},
+							executorField(executor),
+							reasonField(reason, "📝 Removal Reason"),
+							requestedAtField(),
 						)
 						.setFooter({ text: "Zen • Moderation — Confirm or cancel below" })
 						.setTimestamp(),
@@ -524,103 +405,80 @@ defineCommand({
 				components: [buildConfirmRow(WARN_REMOVE_CONFIRM_ID, WARN_REMOVE_CANCEL_ID, "Confirm Remove", "🗑️")],
 			});
 
-			const collector = message.createMessageComponentCollector({
-				filter: (btn) => btn.user.id === interaction.user.id,
-				max: 1,
-				time: 30_000,
-			});
+			createConfirmationCollector({
+				interaction,
+				confirmId: WARN_REMOVE_CONFIRM_ID,
+				cancelId: WARN_REMOVE_CANCEL_ID,
+				cancelledAction: "removal",
+				timedOutMessage: "The removal was not performed.",
+				buildConfirmRowDisabled: () =>
+					buildConfirmRow(
+						WARN_REMOVE_CONFIRM_ID,
+						WARN_REMOVE_CANCEL_ID,
+						"Confirm Remove",
+						"🗑️",
+						undefined,
+						true,
+					),
+				onConfirm: async () => {
+					const startedAt = new Date();
 
-			collector.on("collect", async (btn) => {
-				await btn.deferUpdate();
+					try {
+						await db
+							.delete(warnings)
+							.where(and(eq(warnings.id, warn!.id), eq(warnings.guildId, interaction.guildId)));
+					} catch (err) {
+						log.error({ err, warnId }, "Failed to delete warning");
+						await interaction.editReply({
+							content: blockQuote(
+								`❌ ${bold("Failed")} — Could not delete the warning from the database.`,
+							),
+							components: [],
+						});
+						return;
+					}
 
-				if (btn.customId === WARN_REMOVE_CANCEL_ID) {
-					await interaction.editReply({ embeds: [buildCancelledEmbed("removal")], components: [] });
-					return;
-				}
+					log.info(
+						{ warnId, targetId: warn!.userId, executorId: executor.id, reason },
+						`${executor.user.tag} removed warning #${warnId} from user ${warn!.userId}`,
+					);
 
-				const startedAt = new Date();
-
-				try {
-					await db
-						.delete(warnings)
-						.where(and(eq(warnings.id, warn!.id), eq(warnings.guildId, interaction.guildId)));
-				} catch (err) {
-					log.error({ err, warnId }, "Failed to delete warning");
 					await interaction.editReply({
-						content: blockQuote(`❌ ${bold("Failed")} — Could not delete the warning from the database.`),
+						embeds: [
+							new EmbedBuilder()
+								.setTitle("✅ Warning Removed")
+								.setDescription(
+									`Warning ${inlineCode(`#${warnId}`)} has been removed from ${userMention(warn!.userId)}.`,
+								)
+								.setColor(Colors.Green)
+								.addFields(
+									{
+										name: "🪪 Warning",
+										value: blockQuote(
+											[
+												`${inlineCode("ID:")}     ${bold(String(warnId))}`,
+												`${inlineCode("User:")}   ${userMention(warn!.userId)}`,
+												`${inlineCode("Reason:")} ${bold(warn!.reason)}`,
+											].join("\n"),
+										),
+										inline: true,
+									},
+									executorFieldWithDuration(executor.user, startedAt),
+									reasonField(reason, "📝 Removal Reason"),
+								)
+								.setFooter({ text: "Zen • Moderation" })
+								.setTimestamp(),
+						],
 						components: [],
 					});
-					return;
-				}
-
-				log.info(
-					{ warnId, targetId: warn!.userId, executorId: executor.id, reason },
-					`${executor.user.tag} removed warning #${warnId} from user ${warn!.userId}`,
-				);
-
-				await interaction.editReply({
-					embeds: [
-						new EmbedBuilder()
-							.setTitle("✅ Warning Removed")
-							.setDescription(
-								`Warning ${inlineCode(`#${warnId}`)} has been removed from ${userMention(warn!.userId)}.`,
-							)
-							.setColor(Colors.Green)
-							.addFields(
-								{
-									name: "🪪 Warning",
-									value: blockQuote(
-										[
-											`${inlineCode("ID:")}     ${bold(String(warnId))}`,
-											`${inlineCode("User:")}   ${userMention(warn!.userId)}`,
-											`${inlineCode("Reason:")} ${bold(warn!.reason)}`,
-										].join("\n"),
-									),
-									inline: true,
-								},
-								{
-									name: "🛡️ Executor",
-									value: blockQuote(
-										[
-											`${inlineCode("User:")}     ${bold(executor.user.tag)}`,
-											`${inlineCode("Duration:")} ${bold(`${Date.now() - startedAt.getTime()}ms`)}`,
-										].join("\n"),
-									),
-									inline: true,
-								},
-								{ name: "📝 Removal Reason", value: blockQuote(bold(reason)), inline: false },
-							)
-							.setFooter({ text: "Zen • Moderation" })
-							.setTimestamp(),
-					],
-					components: [],
-				});
-			});
-
-			collector.on("end", async (_, reason) => {
-				if (reason === "time") {
-					await interaction
-						.editReply({
-							embeds: [buildTimedOutEmbed("removal")],
-							components: [
-								buildConfirmRow(
-									WARN_REMOVE_CONFIRM_ID,
-									WARN_REMOVE_CANCEL_ID,
-									"Confirm Remove",
-									"🗑️",
-									true,
-								),
-							],
-						})
-						.catch(() => null);
-				}
+				},
 			});
 
 			return;
 		}
 
 		if (sub === "clear") {
-			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+			await interaction.deferReply({ flags: 64 });
 
 			const targetUser = interaction.options.getUser("user", true);
 			const reason = interaction.options.getString("reason") ?? "No reason provided.";
@@ -650,7 +508,7 @@ defineCommand({
 				return;
 			}
 
-			const message = await interaction.editReply({
+			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle("🧹 Clear All Warnings")
@@ -670,28 +528,9 @@ defineCommand({
 								),
 								inline: true,
 							},
-							{
-								name: "🛡️ Executor",
-								value: blockQuote(
-									[
-										`${inlineCode("User:")} ${bold(executor.user.tag)}`,
-										`${inlineCode("ID:")}   ${inlineCode(executor.id)}`,
-									].join("\n"),
-								),
-								inline: true,
-							},
-							{
-								name: "📝 Reason",
-								value: blockQuote(bold(reason)),
-								inline: false,
-							},
-							{
-								name: "🕐 Requested At",
-								value: blockQuote(
-									`${time(new Date(), TimestampStyles.FullDateShortTime)} (${time(new Date(), TimestampStyles.RelativeTime)})`,
-								),
-								inline: false,
-							},
+							executorField(executor),
+							reasonField(reason),
+							requestedAtField(),
 						)
 						.setFooter({ text: "Zen • Moderation — Confirm or cancel below" })
 						.setTimestamp(),
@@ -699,96 +538,71 @@ defineCommand({
 				components: [buildConfirmRow(WARN_CLEAR_CONFIRM_ID, WARN_CLEAR_CANCEL_ID, "Confirm Clear", "🧹")],
 			});
 
-			const collector = message.createMessageComponentCollector({
-				filter: (btn) => btn.user.id === interaction.user.id,
-				max: 1,
-				time: 30_000,
-			});
+			createConfirmationCollector({
+				interaction,
+				confirmId: WARN_CLEAR_CONFIRM_ID,
+				cancelId: WARN_CLEAR_CANCEL_ID,
+				cancelledAction: "clear",
+				timedOutMessage: "The clear was not performed.",
+				buildConfirmRowDisabled: () =>
+					buildConfirmRow(
+						WARN_CLEAR_CONFIRM_ID,
+						WARN_CLEAR_CANCEL_ID,
+						"Confirm Clear",
+						"🧹",
+						undefined,
+						true,
+					),
+				onConfirm: async () => {
+					const startedAt = new Date();
 
-			collector.on("collect", async (btn) => {
-				await btn.deferUpdate();
+					try {
+						await db
+							.delete(warnings)
+							.where(and(eq(warnings.guildId, interaction.guildId), eq(warnings.userId, targetUser.id)));
+					} catch (err) {
+						log.error({ err, targetId: targetUser.id }, "Failed to clear warnings");
+						await interaction.editReply({
+							content: blockQuote(`❌ ${bold("Failed")} — Could not clear warnings from the database.`),
+							components: [],
+						});
+						return;
+					}
 
-				if (btn.customId === WARN_CLEAR_CANCEL_ID) {
-					await interaction.editReply({ embeds: [buildCancelledEmbed("clear")], components: [] });
-					return;
-				}
+					log.info(
+						{ targetId: targetUser.id, executorId: executor.id, count, reason },
+						`${executor.user.tag} cleared ${count} warning(s) from ${targetUser.tag}`,
+					);
 
-				const startedAt = new Date();
-
-				try {
-					await db
-						.delete(warnings)
-						.where(and(eq(warnings.guildId, interaction.guildId), eq(warnings.userId, targetUser.id)));
-				} catch (err) {
-					log.error({ err, targetId: targetUser.id }, "Failed to clear warnings");
 					await interaction.editReply({
-						content: blockQuote(`❌ ${bold("Failed")} — Could not clear warnings from the database.`),
+						embeds: [
+							new EmbedBuilder()
+								.setTitle("✅ Warnings Cleared")
+								.setDescription(
+									`All ${bold(`${count} warning${count !== 1 ? "s" : ""}`)} from ${userMention(targetUser.id)} have been removed.`,
+								)
+								.setColor(Colors.Green)
+								.addFields(
+									{
+										name: "🎯 Target",
+										value: blockQuote(
+											[
+												`${inlineCode("User:")}     ${bold(targetUser.tag)}`,
+												`${inlineCode("ID:")}       ${inlineCode(targetUser.id)}`,
+												`${inlineCode("Cleared:")}  ${bold(String(count))} warning${count !== 1 ? "s" : ""}`,
+											].join("\n"),
+										),
+										inline: true,
+									},
+									executorFieldWithDuration(executor.user, startedAt),
+									reasonField(reason),
+								)
+								.setFooter({ text: "Zen • Moderation" })
+								.setTimestamp(),
+						],
 						components: [],
 					});
-					return;
-				}
-
-				log.info(
-					{ targetId: targetUser.id, executorId: executor.id, count, reason },
-					`${executor.user.tag} cleared ${count} warning(s) from ${targetUser.tag}`,
-				);
-
-				await interaction.editReply({
-					embeds: [
-						new EmbedBuilder()
-							.setTitle("✅ Warnings Cleared")
-							.setDescription(
-								`All ${bold(`${count} warning${count !== 1 ? "s" : ""}`)} from ${userMention(targetUser.id)} have been removed.`,
-							)
-							.setColor(Colors.Green)
-							.addFields(
-								{
-									name: "🎯 Target",
-									value: blockQuote(
-										[
-											`${inlineCode("User:")}     ${bold(targetUser.tag)}`,
-											`${inlineCode("ID:")}       ${inlineCode(targetUser.id)}`,
-											`${inlineCode("Cleared:")}  ${bold(String(count))} warning${count !== 1 ? "s" : ""}`,
-										].join("\n"),
-									),
-									inline: true,
-								},
-								{
-									name: "🛡️ Executor",
-									value: blockQuote(
-										[
-											`${inlineCode("User:")}     ${bold(executor.user.tag)}`,
-											`${inlineCode("Duration:")} ${bold(`${Date.now() - startedAt.getTime()}ms`)}`,
-										].join("\n"),
-									),
-									inline: true,
-								},
-								{ name: "📝 Reason", value: blockQuote(bold(reason)), inline: false },
-							)
-							.setFooter({ text: "Zen • Moderation" })
-							.setTimestamp(),
-					],
-					components: [],
-				});
-			});
-
-			collector.on("end", async (_, reason) => {
-				if (reason === "time") {
-					await interaction
-						.editReply({
-							embeds: [buildTimedOutEmbed("clear")],
-							components: [
-								buildConfirmRow(
-									WARN_CLEAR_CONFIRM_ID,
-									WARN_CLEAR_CANCEL_ID,
-									"Confirm Clear",
-									"🧹",
-									true,
-								),
-							],
-						})
-						.catch(() => null);
-				}
+				},
 			});
 		}
 	},

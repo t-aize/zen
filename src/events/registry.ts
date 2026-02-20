@@ -29,8 +29,11 @@ import "@/events/shard/shardReady.js";
 import "@/events/shard/shardReconnecting.js";
 import "@/events/shard/shardResume.js";
 
-// Guild — permissions
+// Guild — permissions, join, leave, available
 import "@/events/guild/applicationCommandPermissionsUpdate.js";
+import "@/events/guild/guildCreate.js";
+import "@/events/guild/guildDelete.js";
+import "@/events/guild/guildAvailable.js";
 
 // Member — join, leave, update, user update
 import "@/events/member/guildMemberAdd.js";

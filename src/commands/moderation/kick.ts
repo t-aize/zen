@@ -1,40 +1,34 @@
 import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	blockQuote,
 	bold,
 	Colors,
 	EmbedBuilder,
 	type GuildMember,
 	inlineCode,
-	MessageFlags,
 	PermissionFlagsBits,
 	SlashCommandBuilder,
-	TimestampStyles,
-	time,
 	userMention,
 } from "discord.js";
 import { defineCommand } from "@/commands/index.js";
 import { createLogger } from "@/utils/logger.js";
+import {
+	buildConfirmRow,
+	buildErrorEmbed,
+	createConfirmationCollector,
+	ensureGuild,
+	executorField,
+	executorFieldWithDuration,
+	getBlockReason,
+	reasonField,
+	replyActionBlocked,
+	replyMemberNotFound,
+	requestedAtField,
+	targetField,
+} from "@/utils/moderation.js";
 
-const KICK_CONFIRM_ID = "kick:confirm";
-const KICK_CANCEL_ID = "kick:cancel";
+const CONFIRM_ID = "kick:confirm";
+const CANCEL_ID = "kick:cancel";
 
 const log = createLogger("kick");
-
-/**
- * Returns a human-readable reason why the target cannot be kicked, or `null`
- * if the action is safe to proceed.
- */
-const getKickBlockReason = (executor: GuildMember, target: GuildMember, me: GuildMember): string | null => {
-	if (!target.kickable) return "I don't have permission to kick this member.";
-	if (target.id === executor.id) return "You cannot kick yourself.";
-	if (target.id === me.id) return "I cannot kick myself.";
-	if (target.roles.highest.position >= executor.roles.highest.position)
-		return "You cannot kick a member with an equal or higher role than yours.";
-	return null;
-};
 
 const buildPreviewEmbed = (target: GuildMember, reason: string, executor: GuildMember) =>
 	new EmbedBuilder()
@@ -45,39 +39,10 @@ const buildPreviewEmbed = (target: GuildMember, reason: string, executor: GuildM
 		.setThumbnail(target.displayAvatarURL())
 		.setColor(Colors.Yellow)
 		.addFields(
-			{
-				name: "🎯 Target",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")} ${bold(target.user.tag)}`,
-						`${inlineCode("ID:")}   ${inlineCode(target.id)}`,
-						`${inlineCode("Roles:")} ${bold(String(target.roles.cache.size - 1))}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
-			{
-				name: "🛡️ Executor",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")} ${bold(executor.user.tag)}`,
-						`${inlineCode("ID:")}   ${inlineCode(executor.id)}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
-			{
-				name: "📝 Reason",
-				value: blockQuote(bold(reason)),
-				inline: false,
-			},
-			{
-				name: "🕐 Requested At",
-				value: blockQuote(
-					`${time(new Date(), TimestampStyles.FullDateShortTime)} (${time(new Date(), TimestampStyles.RelativeTime)})`,
-				),
-				inline: false,
-			},
+			targetField(target, [`${inlineCode("Roles:")} ${bold(String(target.roles.cache.size - 1))}`]),
+			executorField(executor),
+			reasonField(reason),
+			requestedAtField(),
 		)
 		.setFooter({ text: "Zen • Moderation — Confirm or cancel below" })
 		.setTimestamp();
@@ -88,51 +53,9 @@ const buildResultEmbed = (target: GuildMember, reason: string, executor: GuildMe
 		.setDescription(`${userMention(target.id)} has been successfully kicked from the server.`)
 		.setThumbnail(target.displayAvatarURL())
 		.setColor(Colors.Green)
-		.addFields(
-			{
-				name: "🎯 Target",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")} ${bold(target.user.tag)}`,
-						`${inlineCode("ID:")}   ${inlineCode(target.id)}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
-			{
-				name: "🛡️ Executor",
-				value: blockQuote(
-					[
-						`${inlineCode("User:")}     ${bold(executor.user.tag)}`,
-						`${inlineCode("Duration:")} ${bold(`${Date.now() - startedAt.getTime()}ms`)}`,
-					].join("\n"),
-				),
-				inline: true,
-			},
-			{
-				name: "📝 Reason",
-				value: blockQuote(bold(reason)),
-				inline: false,
-			},
-		)
+		.addFields(targetField(target), executorFieldWithDuration(executor.user, startedAt), reasonField(reason))
 		.setFooter({ text: "Zen • Moderation" })
 		.setTimestamp();
-
-const buildConfirmRow = (disabled = false) =>
-	new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setCustomId(KICK_CONFIRM_ID)
-			.setLabel("Confirm Kick")
-			.setEmoji("👢")
-			.setStyle(ButtonStyle.Danger)
-			.setDisabled(disabled),
-		new ButtonBuilder()
-			.setCustomId(KICK_CANCEL_ID)
-			.setLabel("Cancel")
-			.setEmoji("✖️")
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(disabled),
-	);
 
 defineCommand({
 	data: new SlashCommandBuilder()
@@ -150,15 +73,10 @@ defineCommand({
 		),
 
 	execute: async (interaction) => {
-		if (!interaction.inCachedGuild()) {
-			await interaction.reply({
-				content: blockQuote(`⛔ ${bold("Server only")} — This command cannot be used in DMs.`),
-				flags: MessageFlags.Ephemeral,
-			});
-			return;
-		}
+		if (!(await ensureGuild(interaction))) return;
+		if (!interaction.inCachedGuild()) return;
 
-		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+		await interaction.deferReply({ flags: 64 });
 
 		const targetUser = interaction.options.getUser("user", true);
 		const reason = interaction.options.getString("reason") ?? "No reason provided.";
@@ -168,101 +86,60 @@ defineCommand({
 		const target = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
 
 		if (!target) {
-			await interaction.editReply({
-				content: blockQuote(
-					`⛔ ${bold("Member not found")} — ${userMention(targetUser.id)} (${inlineCode(targetUser.id)}) is not in this server.`,
-				),
-			});
+			await replyMemberNotFound(interaction, targetUser.id);
 			return;
 		}
 
-		const blockReason = getKickBlockReason(executor, target, me);
+		const blockReason = getBlockReason(executor, target, me, {
+			permissionCheck: target.kickable,
+			noPermissionMessage: "I don't have permission to kick this member.",
+			action: "kick",
+		});
 
 		if (blockReason) {
-			await interaction.editReply({
-				content: blockQuote(`⛔ ${bold("Action blocked")} — ${blockReason}`),
-			});
+			await replyActionBlocked(interaction, blockReason);
 			return;
 		}
 
-		const message = await interaction.editReply({
+		await interaction.editReply({
 			embeds: [buildPreviewEmbed(target, reason, executor)],
-			components: [buildConfirmRow()],
+			components: [buildConfirmRow(CONFIRM_ID, CANCEL_ID, "Confirm Kick", "👢")],
 		});
 
-		const collector = message.createMessageComponentCollector({
-			filter: (btn) => btn.user.id === interaction.user.id,
-			max: 1,
-			time: 30_000,
-		});
+		createConfirmationCollector({
+			interaction,
+			confirmId: CONFIRM_ID,
+			cancelId: CANCEL_ID,
+			cancelledAction: "kick",
+			timedOutMessage: "No action was taken.",
+			buildConfirmRowDisabled: () =>
+				buildConfirmRow(CONFIRM_ID, CANCEL_ID, "Confirm Kick", "👢", undefined, true),
+			onConfirm: async () => {
+				const startedAt = new Date();
 
-		collector.on("collect", async (btn) => {
-			await btn.deferUpdate();
-
-			if (btn.customId === KICK_CANCEL_ID) {
-				await interaction.editReply({
-					embeds: [
-						new EmbedBuilder()
-							.setTitle("🚫 Cancelled")
-							.setDescription("The kick was cancelled. No action was taken.")
-							.setColor(Colors.Grey)
-							.setFooter({ text: "Zen • Moderation" })
-							.setTimestamp(),
-					],
-					components: [],
-				});
-				return;
-			}
-
-			const startedAt = new Date();
-
-			try {
-				await target.kick(`[Zen] Kicked by ${executor.user.tag}: ${reason}`);
-			} catch (err) {
-				log.error({ err, targetId: target.id, executorId: executor.id }, "Failed to kick member");
-				await interaction.editReply({
-					embeds: [
-						new EmbedBuilder()
-							.setTitle("❌ Kick Failed")
-							.setDescription("An unexpected error occurred while kicking the member.")
-							.setColor(Colors.Red)
-							.setFooter({ text: "Zen • Moderation" })
-							.setTimestamp(),
-					],
-					components: [],
-				});
-				return;
-			}
-
-			log.info(
-				{ targetId: target.id, executorId: executor.id, reason },
-				`${executor.user.tag} kicked ${target.user.tag}`,
-			);
-
-			await interaction.editReply({
-				embeds: [buildResultEmbed(target, reason, executor, startedAt)],
-				components: [],
-			});
-		});
-
-		collector.on("end", async (_, reason) => {
-			if (reason === "time") {
-				await interaction
-					.editReply({
+				try {
+					await target.kick(`[Zen] Kicked by ${executor.user.tag}: ${reason}`);
+				} catch (err) {
+					log.error({ err, targetId: target.id, executorId: executor.id }, "Failed to kick member");
+					await interaction.editReply({
 						embeds: [
-							new EmbedBuilder()
-								.setTitle("⏱️ Timed Out")
-								.setDescription(
-									"The confirmation prompt expired after 30 seconds. No action was taken.",
-								)
-								.setColor(Colors.Grey)
-								.setFooter({ text: "Zen • Moderation" })
-								.setTimestamp(),
+							buildErrorEmbed("Kick Failed", "An unexpected error occurred while kicking the member."),
 						],
-						components: [buildConfirmRow(true)],
-					})
-					.catch(() => null);
-			}
+						components: [],
+					});
+					return;
+				}
+
+				log.info(
+					{ targetId: target.id, executorId: executor.id, reason },
+					`${executor.user.tag} kicked ${target.user.tag}`,
+				);
+
+				await interaction.editReply({
+					embeds: [buildResultEmbed(target, reason, executor, startedAt)],
+					components: [],
+				});
+			},
 		});
 	},
 });

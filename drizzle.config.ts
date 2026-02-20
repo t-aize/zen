@@ -10,7 +10,14 @@ export default defineConfig({
 	 * resolve ESM `.js` extensions used in the barrel (`schema/index.ts`).
 	 * Add every new table file here as well as in `src/db/schema/index.ts`.
 	 */
-	schema: ["./src/db/schema/guilds.ts", "./src/db/schema/warnings.ts", "./src/db/schema/auditLogConfig.ts"],
+	schema: [
+		"./src/db/schema/guilds.ts",
+		"./src/db/schema/warnings.ts",
+		"./src/db/schema/auditLogConfig.ts",
+		"./src/db/schema/tickets.ts",
+		"./src/db/schema/notes.ts",
+		"./src/db/schema/giveaways.ts",
+	],
 
 	/**
 	 * Output directory for generated SQL migration files.
