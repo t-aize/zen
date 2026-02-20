@@ -3,6 +3,16 @@
 All notable changes to **Zen** will be documented in this file.
 
 
+## [0.0.3](https://github.com/t-aize/zen/compare/v0.0.2...v0.0.3) (2026-02-20)
+
+### ✨ Features
+
+* add new event handlers and database schemas for guild management and ticketing system ([d94e6b3](https://github.com/t-aize/zen/commit/d94e6b3fef908b5ff81956dc75dae403c888b5a8))
+
+### ♻️ Refactoring
+
+* remove type annotations from event handlers for improved flexibility ([2cfdab7](https://github.com/t-aize/zen/commit/2cfdab7a51ae8b5603dfc16e748e6976d9528a58))
+
 ## [0.0.2](https://github.com/t-aize/zen/compare/v0.0.1...v0.0.2) (2026-02-19)
 
 ### ✨ Features
