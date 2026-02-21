@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="zen" uuid="905bb40a-3bc0-40f8-a7fc-e09608caae30">
+    <data-source source="LOCAL" name="local" uuid="47bbc141-fdc7-493b-a98f-68207010f4d1">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/data/zen.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/local.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
