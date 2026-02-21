@@ -4,115 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4399b7e7-63d1-4d37-ab04-93b885fe4100" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.husky/pre-commit" beforeDir="false" afterPath="$PROJECT_DIR$/.husky/pre-commit" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/biome.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/905bb40a-3bc0-40f8-a7fc-e09608caae30.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/905bb40a-3bc0-40f8-a7fc-e09608caae30/storage_v2/_src_/schema/main.uQUzAA.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="4399b7e7-63d1-4d37-ab04-93b885fe4100" name="Changes" comment="feat: add initial setup for authentication and warnings management">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.release-it.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/biome.json" beforeDir="false" afterPath="$PROJECT_DIR$/biome.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/.gitkeep" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0000_nervous_tyger_tiger.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0001_goofy_shiver_man.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0002_windy_menace.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0003_parallel_siren.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0004_small_proteus.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0000_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0001_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0002_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0003_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0004_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-workspace.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-workspace.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/config/auditlog.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/ban.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/clear.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/kick.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/lock.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/massban.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/mute.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/nickname.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/note.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/purge.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/slowmode.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/unban.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/unlock.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/unmute.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/moderation/warn.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/registry.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commands/utility/ping.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/auditLogConfig.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/giveaways.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/guilds.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/notes.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/tickets.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/warnings.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/channel/channelCreate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/channel/channelDelete.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/channel/channelPinsUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/channel/channelUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/channel/webhooksUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/client/cacheSweep.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/client/debug.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/client/error.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/client/warn.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/guild/applicationCommandPermissionsUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/guild/guildAvailable.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/guild/guildCreate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/guild/guildDelete.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/interaction/interactionCreate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/lifecycle/clientReady.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/lifecycle/invalidated.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/member/guildMemberAdd.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/member/guildMemberRemove.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/member/guildMemberUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/member/userUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageCreate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageDelete.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageDeleteBulk.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageReactionAdd.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageReactionRemove.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageReactionRemoveAll.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageReactionRemoveEmoji.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/message/messageUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/registry.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/role/roleCreate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/role/roleDelete.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/role/roleUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/shard/shardDisconnect.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/shard/shardError.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/shard/shardReady.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/shard/shardReconnecting.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/shard/shardResume.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/voice/stageInstanceCreate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/voice/stageInstanceDelete.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/voice/stageInstanceUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/voice/voiceChannelEffectSend.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/events/voice/voiceStateUpdate.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/auditLog.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/env.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/logger.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/moderation.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,7 +64,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/minec/IdeaProjects/zen/apps/bot",
+    "last_opened_file_path": "C:/Users/minec/IdeaProjects/zen",
     "nodejs_package_manager_path": "npm",
     "npm.bot > type-check.executor": "Run",
     "npm.check.executor": "Run",
@@ -190,6 +85,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\minec\IdeaProjects\zen" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\bot" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\web" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\bot\src" />
@@ -283,8 +179,17 @@
       <option name="presentableId" value="Default" />
       <updated>1771672995336</updated>
       <workItem from="1771672996223" duration="205000" />
-      <workItem from="1771711235956" duration="3850000" />
+      <workItem from="1771711235956" duration="4496000" />
     </task>
+    <task id="LOCAL-00001" summary="feat: add initial setup for authentication and warnings management">
+      <option name="closed" value="true" />
+      <created>1771715240964</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1771715240965</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -294,6 +199,8 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/zen" />
     </ignored-roots>
+    <MESSAGE value="feat: add initial setup for authentication and warnings management" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add initial setup for authentication and warnings management" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

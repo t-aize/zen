@@ -19,8 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "zen",
-	description: "zen",
+	title: "Zen - Discord Moderation Bot",
+	description:
+		"A powerful, easy-to-use moderation bot for your Discord server. Warnings, logs, and more — all in one place.",
 };
 
 export default function RootLayout({
@@ -34,9 +35,7 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				<TooltipProvider>
-					<Providers>
-						<div className="grid h-svh grid-rows-[auto_1fr]">{children}</div>
-					</Providers>
+					<Providers>{children}</Providers>
 				</TooltipProvider>
 			</body>
 		</html>
