@@ -1,53 +1,26 @@
-# Dependencies
-node_modules
-.pnp
-.pnp.js
-
-# Build outputs
-dist
-build
-*.tsbuildinfo
-
-# Environment variables
+/target
+Cargo.lock
 .env
-.env*.local
-
-# IDEs and editors
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
+.env.*
+!.env.example
+*.log
+logs/
+*.db
+*.sqlite
+*.sqlite3
+.DS_Store
+.DS_Store?
+Thumbs.db
+Desktop.ini
+.vscode/
 !.vscode/extensions.json
-.idea
+!.vscode/settings.json
+.idea/
 *.swp
 *.swo
 *~
-.DS_Store
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# Turbo
-.turbo
-
-# Better-T-Stack
-.alchemy
-
-# Testing
-coverage
-.nyc_output
-
-# Misc
-*.tgz
-.cache
-tmp
-temp
-
-# sqlite database
-*.db
+/dist
+/build
+*.pid
+.dockerignore
+docker-compose.override.yml

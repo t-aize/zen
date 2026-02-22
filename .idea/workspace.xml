@@ -3,11 +3,16 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml">
+      <package file="$PROJECT_DIR$">
+        <feature name="default" enabled="true" />
+      </package>
+    </cargoProject>
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="4399b7e7-63d1-4d37-ab04-93b885fe4100" name="Changes" comment="feat: add initial setup for authentication and warnings management">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/app/page.tsx" afterDir="false" />
+    <list default="true" id="4399b7e7-63d1-4d37-ab04-93b885fe4100" name="Changes" comment="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +22,7 @@
   <component name="CopilotPersistence">
     <persistenceIdMap>
       <entry key="_C:/Users/minec/IdeaProjects/zen" value="39yeykAGRsn20UCQSTlvxEWaQZk" />
+      <entry key="_C:/Users/minec/RustroverProjects/zen" value="3A269Pc7XZiWL9JfWAiyi8xBc1s" />
     </persistenceIdMap>
   </component>
   <component name="CopilotUserSelectedModel">
@@ -24,6 +30,17 @@
       <entry key="chat-panel" value="Claude Opus 4.6" />
       <entry key="agent-panel" value="Claude Opus 4.6" />
     </selectedModels>
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -36,12 +53,15 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/t-aize/zen&quot;,
-    &quot;accountId&quot;: &quot;e332da55-7c75-4768-a781-74dd924fc3f0&quot;
+    &quot;url&quot;: &quot;https://github.com/t-aize/zen.git&quot;,
+    &quot;accountId&quot;: &quot;e4d5f995-a532-4d8a-8ab4-f6d415017cdc&quot;
   }
 }</component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="VmD9nFXe" />
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -55,60 +75,75 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/minec/IdeaProjects/zen",
-    "nodejs_package_manager_path": "npm",
-    "npm.bot > type-check.executor": "Run",
-    "npm.check.executor": "Run",
-    "npm.db > db:generate.executor": "Run",
-    "npm.db > db:migrate.executor": "Run",
-    "npm.db > db:push.executor": "Run",
-    "npm.db:push.executor": "Run",
-    "npm.dev.executor": "Run",
-    "npm.dev:bot.executor": "Run",
-    "npm.dev:web.executor": "Run",
-    "npm.type-check.executor": "Run",
-    "npm.web > type-check.executor": "Run",
-    "org.rust.first.attach.projects": "true",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "ts.external.directory.path": "C:\\Users\\minec\\IdeaProjects\\zen\\packages\\db\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Cargo.Run zen.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;code.cleanup.on.save&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/minec/RustroverProjects/zen&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.bot &gt; type-check.executor&quot;: &quot;Run&quot;,
+    &quot;npm.check.executor&quot;: &quot;Run&quot;,
+    &quot;npm.db &gt; db:generate.executor&quot;: &quot;Run&quot;,
+    &quot;npm.db &gt; db:migrate.executor&quot;: &quot;Run&quot;,
+    &quot;npm.db &gt; db:push.executor&quot;: &quot;Run&quot;,
+    &quot;npm.db:push.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev:bot.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev:web.executor&quot;: &quot;Run&quot;,
+    &quot;npm.type-check.executor&quot;: &quot;Run&quot;,
+    &quot;npm.web &gt; type-check.executor&quot;: &quot;Run&quot;,
+    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;language.rust.cargo.check&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\minec\\IdeaProjects\\zen\\packages\\db\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\minec\RustroverProjects\zen" />
       <recent name="C:\Users\minec\IdeaProjects\zen" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\bot" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\web" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\bot\src" />
-      <recent name="C:\Users\minec\IdeaProjects\zen\packages\db" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\minec\RustroverProjects\zen" />
       <recent name="C:\Users\minec\IdeaProjects\zen\packages\db\src\schema" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\bot" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\bot\src" />
       <recent name="C:\Users\minec\IdeaProjects\zen\apps\web\src\env" />
-      <recent name="C:\Users\minec\IdeaProjects\zen\apps\web" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev:web">
-    <configuration name="bot &gt; type-check" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/apps/bot/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="type-check" />
-      </scripts>
-      <node-interpreter value="project" />
+  <component name="RunManager" selected="Cargo.Run zen">
+    <configuration name="Run zen" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="dev" />
+      <option name="command" value="run --package zen --bin zen" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
-      <method v="2" />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
     </configuration>
     <configuration name="check" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
@@ -152,11 +187,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Run zen" />
         <item itemvalue="npm.dev:web" />
         <item itemvalue="npm.dev:bot" />
         <item itemvalue="npm.check" />
         <item itemvalue="npm.type-check" />
-        <item itemvalue="npm.bot &gt; type-check" />
       </list>
     </recent_temporary>
   </component>
@@ -180,6 +215,8 @@
       <updated>1771672995336</updated>
       <workItem from="1771672996223" duration="205000" />
       <workItem from="1771711235956" duration="4496000" />
+      <workItem from="1771778166403" duration="416000" />
+      <workItem from="1771778608938" duration="5645000" />
     </task>
     <task id="LOCAL-00001" summary="feat: add initial setup for authentication and warnings management">
       <option name="closed" value="true" />
@@ -189,7 +226,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771715240965</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details">
+      <option name="closed" value="true" />
+      <created>1771788150292</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1771788150293</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -200,7 +245,8 @@
       <path value="$PROJECT_DIR$/zen" />
     </ignored-roots>
     <MESSAGE value="feat: add initial setup for authentication and warnings management" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add initial setup for authentication and warnings management" />
+    <MESSAGE value="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
