@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
 
     let config = Config::from_env()?;
 
-    let intents = GatewayIntents::GUILDS;
+    let intents = GatewayIntents::all();
 
     let mut client = Client::builder(&config.discord_token, intents)
         .event_handler(Handler {
