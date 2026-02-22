@@ -11,8 +11,10 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4399b7e7-63d1-4d37-ab04-93b885fe4100" name="Changes" comment="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="4399b7e7-63d1-4d37-ab04-93b885fe4100" name="Changes" comment="feat: enable all Discord gateway intents for bot client">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/ping.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/ping.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -217,6 +219,8 @@
       <workItem from="1771711235956" duration="4496000" />
       <workItem from="1771778166403" duration="416000" />
       <workItem from="1771778608938" duration="5645000" />
+      <workItem from="1771788477041" duration="74000" />
+      <workItem from="1771793485592" duration="2313000" />
     </task>
     <task id="LOCAL-00001" summary="feat: add initial setup for authentication and warnings management">
       <option name="closed" value="true" />
@@ -234,7 +238,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771788150293</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details">
+      <option name="closed" value="true" />
+      <created>1771788501110</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1771788501110</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat: enable all Discord gateway intents for bot client">
+      <option name="closed" value="true" />
+      <created>1771793514136</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1771793514136</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -246,7 +266,8 @@
     </ignored-roots>
     <MESSAGE value="feat: add initial setup for authentication and warnings management" />
     <MESSAGE value="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add initial Rust bot implementation with ping command, config, and diagnostics&#10;&#10;- Add Rust workspace with Cargo.toml and .gitignore&#10;- Implement bot startup, config loading, and graceful shutdown&#10;- Add modular command handler with ping command for latency diagnostics&#10;- Provide ephemeral ping response with WebSocket, REST, uptime, and memory info&#10;- Include environment variable example and update README with Rust bot details" />
+    <MESSAGE value="feat: enable all Discord gateway intents for bot client" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enable all Discord gateway intents for bot client" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
