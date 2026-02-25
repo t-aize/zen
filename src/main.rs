@@ -2,6 +2,7 @@ mod commands;
 mod config;
 mod data;
 mod handler;
+mod locales;
 
 use anyhow::Result;
 use serenity::prelude::*;

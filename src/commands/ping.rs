@@ -11,6 +11,7 @@ use serenity::all::{
 use tracing::debug;
 
 use crate::data::ShardManagerContainer;
+use crate::locales::Locales;
 
 static START_TIME: OnceLock<Instant> = OnceLock::new();
 
@@ -19,168 +20,151 @@ pub const PREFIX: &str = "ping:";
 const REFRESH_ID: &str = "ping:refresh";
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new(NAME)
-        .description("Displays WebSocket gateway and REST API latency diagnostics.")
-        .name_localized("id", "ping")
-        .name_localized("da", "ping")
-        .name_localized("de", "ping")
-        .name_localized("en-GB", "ping")
-        .name_localized("en-US", "ping")
-        .name_localized("es-ES", "ping")
-        .name_localized("es-419", "ping")
-        .name_localized("fr", "ping")
-        .name_localized("hr", "ping")
-        .name_localized("it", "ping")
-        .name_localized("lt", "ping")
-        .name_localized("hu", "ping")
-        .name_localized("nl", "ping")
-        .name_localized("no", "ping")
-        .name_localized("pl", "ping")
-        .name_localized("pt-BR", "ping")
-        .name_localized("ro", "ping")
-        .name_localized("fi", "ping")
-        .name_localized("sv-SE", "ping")
-        .name_localized("vi", "ping")
-        .name_localized("tr", "ping")
-        .name_localized("cs", "ping")
-        .name_localized("el", "ping")
-        .name_localized("bg", "ping")
-        .name_localized("ru", "ping")
-        .name_localized("uk", "ping")
-        .name_localized("hi", "ping")
-        .name_localized("th", "ping")
-        .name_localized("zh-CN", "ping")
-        .name_localized("ja", "ping")
-        .name_localized("zh-TW", "ping")
-        .name_localized("ko", "ping")
-        .description_localized(
-            "id",
+    const DEFAULT_DESCRIPTION: &'static str =
+        "Displays WebSocket gateway and REST API latency diagnostics.";
+    const DESCRIPTION_LOCALES: &[(Locales, &str)] = &[
+        (
+            Locales::Id,
             "Menampilkan diagnostik latensi WebSocket gateway dan REST API.",
-        )
-        .description_localized(
-            "da",
+        ),
+        (
+            Locales::Da,
             "Viser WebSocket-gateway og REST API-latensdiagnostik.",
-        )
-        .description_localized(
-            "de",
+        ),
+        (
+            Locales::De,
             "Zeigt Latenzdiagnosen für WebSocket-Gateway und REST-API an.",
-        )
-        .description_localized(
-            "en-GB",
+        ),
+        (
+            Locales::EnGb,
             "Displays WebSocket gateway and REST API latency diagnostics.",
-        )
-        .description_localized(
-            "en-US",
+        ),
+        (
+            Locales::EnUs,
             "Displays WebSocket gateway and REST API latency diagnostics.",
-        )
-        .description_localized(
-            "es-ES",
+        ),
+        (
+            Locales::EsEs,
             "Muestra diagnósticos de latencia del gateway WebSocket y la API REST.",
-        )
-        .description_localized(
-            "es-419",
+        ),
+        (
+            Locales::Es419,
             "Muestra diagnósticos de latencia del gateway WebSocket y la API REST.",
-        )
-        .description_localized(
-            "fr",
+        ),
+        (
+            Locales::Fr,
             "Affiche les diagnostics de latence du gateway WebSocket et de l'API REST.",
-        )
-        .description_localized(
-            "hr",
+        ),
+        (
+            Locales::Hr,
             "Prikazuje dijagnostiku latencije WebSocket gatewaya i REST API-ja.",
-        )
-        .description_localized(
-            "it",
+        ),
+        (
+            Locales::It,
             "Mostra la diagnostica della latenza del gateway WebSocket e dell'API REST.",
-        )
-        .description_localized(
-            "lt",
+        ),
+        (
+            Locales::Lt,
             "Rodo WebSocket tinklų sietuvo ir REST API delsos diagnostiką.",
-        )
-        .description_localized(
-            "hu",
+        ),
+        (
+            Locales::Hu,
             "Megjeleníti a WebSocket átjáró és REST API késleltetési diagnosztikáját.",
-        )
-        .description_localized(
-            "nl",
+        ),
+        (
+            Locales::Nl,
             "Toont WebSocket-gateway en REST API-latentiediagnostiek.",
-        )
-        .description_localized(
-            "no",
+        ),
+        (
+            Locales::No,
             "Viser diagnostikk for WebSocket-gateway og REST API-latens.",
-        )
-        .description_localized(
-            "pl",
+        ),
+        (
+            Locales::Pl,
             "Wyświetla diagnostykę opóźnień bramy WebSocket i interfejsu REST API.",
-        )
-        .description_localized(
-            "pt-BR",
+        ),
+        (
+            Locales::PtBr,
             "Exibe diagnósticos de latência do gateway WebSocket e da API REST.",
-        )
-        .description_localized(
-            "ro",
+        ),
+        (
+            Locales::Ro,
             "Afișează diagnosticarea latenței gateway-ului WebSocket și API-ului REST.",
-        )
-        .description_localized(
-            "fi",
+        ),
+        (
+            Locales::Fi,
             "Näyttää WebSocket-yhdyskäytävän ja REST API:n latenssin diagnostiikan.",
-        )
-        .description_localized(
-            "sv-SE",
+        ),
+        (
+            Locales::SvSe,
             "Visar latensdiagnostik för WebSocket-gateway och REST API.",
-        )
-        .description_localized(
-            "vi",
+        ),
+        (
+            Locales::Vi,
             "Hiển thị chẩn đoán độ trễ cổng WebSocket và REST API.",
-        )
-        .description_localized(
-            "tr",
+        ),
+        (
+            Locales::Tr,
             "WebSocket ağ geçidi ve REST API gecikme tanılamalarını görüntüler.",
-        )
-        .description_localized(
-            "cs",
+        ),
+        (
+            Locales::Cs,
             "Zobrazuje diagnostiku latence WebSocket brány a REST API.",
-        )
-        .description_localized(
-            "el",
+        ),
+        (
+            Locales::El,
             "Εμφανίζει διαγνωστικά καθυστέρησης πύλης WebSocket και REST API.",
-        )
-        .description_localized(
-            "bg",
+        ),
+        (
+            Locales::Bg,
             "Показва диагностика на латентността на WebSocket шлюза и REST API.",
-        )
-        .description_localized(
-            "ru",
+        ),
+        (
+            Locales::Ru,
             "Отображает диагностику задержки шлюза WebSocket и REST API.",
-        )
-        .description_localized(
-            "uk",
+        ),
+        (
+            Locales::Uk,
             "Відображає діагностику затримки шлюзу WebSocket та REST API.",
-        )
-        .description_localized(
-            "hi",
+        ),
+        (
+            Locales::Hi,
             "WebSocket गेटवे और REST API विलंबता निदान प्रदर्शित करता है।",
-        )
-        .description_localized(
-            "th",
+        ),
+        (
+            Locales::Th,
             "แสดงการวินิจฉัยความหน่วงของ WebSocket gateway และ REST API",
-        )
-        .description_localized("zh-CN", "显示 WebSocket 网关和 REST API 延迟诊断。")
-        .description_localized(
-            "ja",
+        ),
+        (Locales::ZhCn, "显示 WebSocket 网关和 REST API 延迟诊断。"),
+        (
+            Locales::Ja,
             "WebSocketゲートウェイとREST APIのレイテンシ診断を表示します。",
-        )
-        .description_localized("zh-TW", "顯示 WebSocket 閘道和 REST API 延遲診斷。")
-        .description_localized(
-            "ko",
+        ),
+        (Locales::ZhTw, "顯示 WebSocket 閘道和 REST API 延遲診斷。"),
+        (
+            Locales::Ko,
             "WebSocket 게이트웨이 및 REST API 지연 시간 진단을 표시합니다.",
-        )
+        ),
+    ];
+
+    let mut cmd = CreateCommand::new(NAME)
+        .description(DEFAULT_DESCRIPTION)
         .integration_types(vec![InstallationContext::Guild, InstallationContext::User])
         .contexts(vec![
             InteractionContext::Guild,
             InteractionContext::BotDm,
             InteractionContext::PrivateChannel,
-        ])
+        ]);
+
+    for locale in Locales::ALL {
+        cmd = cmd.name_localized(locale.code(), NAME);
+    }
+
+    for &(locale, description) in DESCRIPTION_LOCALES {
+        cmd = cmd.description_localized(locale.code(), description);
+    }
+
+    cmd
 }
 
 pub async fn run(ctx: &Context, cmd: &CommandInteraction) -> Result<()> {
