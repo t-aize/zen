@@ -1,197 +1,268 @@
 <div align="center">
 
-# 🧘 Zen — Simply powerful, purely open-source.
+# 🧘 Zen
 
-**The last Discord bot you'll ever need.**  
-All-in-one, 100% free, forever. No paywalls. No premium tiers. Just Zen.
+### One bot. Full stack. Open-source. Self-hostable.
 
-<img src="https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge" alt="Version">
-<img src="https://img.shields.io/badge/license-Apache%202.0-green?style=for-the-badge" alt="License">
-<img src="https://img.shields.io/badge/open%20source-♥-red?style=for-the-badge" alt="Open Source">
-<img src="https://img.shields.io/badge/built%20with-Rust-orange?style=for-the-badge&logo=rust&logoColor=white" alt="Rust">
+**Zen** is a multilingual, multifunction Discord bot platform that combines moderation, tickets, music, levels, utilities, anti-raid protection, and server management — all in one ecosystem with a web dashboard.
 
-
-[Invite Zen](#) · [Documentation](#) · [Support Server](#) · [Report a Bug](#)
+![Version](https://img.shields.io/badge/version-0.1.0-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/license-Apache%202.0-green?style=for-the-badge)
+![Open Source](https://img.shields.io/badge/open--source-yes-success?style=for-the-badge)
+![Self Hostable](https://img.shields.io/badge/self--hostable-yes-purple?style=for-the-badge)
 
 </div>
 
 ---
 
-## 🌟 Overview
+## Vision
 
-Zen is a **multipurpose Discord bot** built in Rust for communities of all sizes. It replaces the pile of bots
-cluttering your server with a single, blazing-fast solution — covering moderation, security, music, economy, leveling,
-games, and much more.
+Discord servers often rely on multiple bots to cover moderation, tickets, music, XP systems, automations, anti-raid protection, and utility commands.
 
-Open-source at its core, Zen is built by the community, for the community. Every feature, for everyone, always.
+That creates problems:
+
+- fragmented configuration
+- inconsistent permissions
+- duplicated features
+- reliability issues
+- paid feature lock-in
+- poor observability for server admins
+
+**Zen** solves this by providing a **unified bot platform** with a **web dashboard**, **multilingual support**, and a **modular architecture** designed for real-world hosting.
 
 ---
 
-## ✨ Features
+## What Zen Is
 
-### 🛡️ Security & Anti-Raid
+Zen is designed as an **all-in-one Discord bot platform** that can replace multiple bots in a server while remaining:
 
-Advanced real-time protection against raids, nuke attempts, and bot attacks. Configurable thresholds for join velocity,
-mass mention, mass channel/role deletion, and token detection. Instant server lockdown with automatic recovery —
-inspired by RaidProtect.
+- **Open-source**
+- **Self-hostable**
+- **Extensible**
+- **Production-ready**
+- **Privacy-conscious**
+- **Admin-friendly**
 
-### 🔨 Moderation
+---
 
-Full moderation suite with warnings, mutes, timeouts, kicks, bans, and softbans. Infraction history, auto-mod with
-custom word filters, spam/caps/link detection, and configurable punishments. Complete audit log with search and export.
+## Core Feature Pillars
 
-### 📈 Leveling & XP
+### 🛡️ Moderation & Anti-Raid
+- Ban / kick / timeout / unban / warn systems
+- Bulk moderation actions
+- Role / channel lock tools
+- Anti-spam / anti-mention spam / anti-invite / anti-link filters
+- Join flood detection and raid mitigation
+- Account age / server age gating
+- Auto quarantine / verification workflows
+- Mod logs and audit trails
 
-A rich leveling system with per-server XP rates, level-up announcements, role rewards, and leaderboards — everything
-you'd expect from MEE6 and more, for free. Voice XP, message XP, and bonus XP events are all supported.
-
-### 💰 Economy & RPG
-
-A fully-fledged server economy with virtual currency, daily/weekly rewards, a shop, inventory, crafting, and trading.
-Rob, gamble, work, and grind your way up. RPG-style profiles with customizable cards.
+### 🎫 Tickets & Support
+- Ticket panels and buttons
+- Category / channel routing
+- Ticket claim / close / reopen / archive flows
+- Staff permission templates
+- Ticket transcripts (text export)
+- SLA-friendly workflows (optional)
 
 ### 🎵 Music
+- Voice playback queue
+- Basic controls (play, pause, skip, stop, volume)
+- Queue management and loop modes
+- Optional dedicated audio backend for scale
+- Permission-aware voice controls
 
-High-quality music playback from YouTube, Spotify, SoundCloud, and more. Queue management, filters (bassboost,
-nightcore, vaporwave…), looping, shuffle, volume control, and DJ roles. Powered by Lavalink for optimal performance.
+### 📈 Levels, Engagement & Automation
+- XP / levels / rank cards
+- Reward roles
+- Message and activity triggers
+- Scheduled announcements
+- Welcome / goodbye messages
+- Reaction roles / role menus
+- Giveaways and utility automations (optional modules)
 
-### 🎫 Ticket System
+### ⚙️ Utilities & Server Management
+- Server info, user info, avatar/banner tools
+- Polls, reminders, embeds, custom commands
+- Configurable prefixes (if text commands are enabled)
+- Slash-first interaction design
+- Permission-safe admin tooling
 
-Structured support tickets with staff roles, private threads, transcripts, category routing, ratings, and auto-close.
-Perfect for communities needing clean and traceable support workflows.
+### 🌍 Multilingual Experience
+- Multi-language commands, responses, and dashboard UI
+- Per-guild language selection
+- Fallback language strategy
+- Localized command descriptions
+- Translation-ready content pipeline
 
-### 🎉 Giveaways & Events
-
-Host fully customizable giveaways with entry requirements (roles, invites, level), multiple winners, reroll, and
-scheduled draws. Create server events with reminders and RSVP tracking.
-
-### 🤝 Starboard
-
-Automatically highlight the best messages in your community. Configurable emoji, threshold, and channel. Self-stars
-prevention and NSFW channel filtering included.
-
-### 📩 Welcome & Farewell
-
-Rich welcome and farewell messages with fully customizable embed cards, background images, member counters, DM
-greetings, and auto-role on join — like Koya but open.
-
-### 🔢 Member Counter
-
-Real-time voice channel counters for total members, humans, bots, online members, and custom stats — inspired by
-DoubleCounter. Multiple counters per server, each with custom naming templates.
-
-### ⚙️ Reaction Roles & Auto-Roles
-
-Create unlimited reaction role menus with button, dropdown, or emoji styles. Unique, multiple, or verified mode.
-Auto-assign roles on join, on verify, or on level milestones.
-
-### 📊 Analytics & Statistics
-
-Deep insights into your server's growth, message activity, peak hours, top contributors, command usage, and moderation
-trends. Beautiful charts and exportable reports.
-
-### 🃏 Custom Commands
-
-Create personalized commands with rich text responses, embeds, variables, permission checks, cooldowns, and aliases —
-like DraftBot's custom commands feature.
-
-### 🎮 Games & Entertainment
-
-Trivia with multiple categories and difficulty levels, word games, image manipulation commands, memes, 8ball, coinflip,
-RPS, and more to keep your community entertained.
-
-### 🌐 Multilingual Support
-
-Zen speaks your members' language. Full support for multiple locales with per-server and per-user language preferences.
-
-### 🗓️ Reminders & Polls
-
-Set personal or public reminders, create polls with multiple choices, real-time vote tracking, and scheduled closing
-with results announcement.
-
-### 📋 Logging & Audit
-
-Granular event logging for messages (edit, delete), members (join, leave, ban), roles, channels, voice activity, and
-invites. Each log type routes to its own channel.
-
-### 🔧 Deep Customization
-
-Every module can be enabled, disabled, or configured independently. Per-channel and per-role overrides for nearly every
-feature. Zen adapts to your server, not the other way around.
+### 🌐 Web Dashboard
+- Secure authentication (Discord OAuth2)
+- Guild-scoped admin access
+- Centralized configuration for all modules
+- Role/permission-aware settings UI
+- Logs, analytics, and system health visibility
+- Safer config changes than in-chat command editing
 
 ---
 
-## 🚀 Why Zen?
+## Principles
 
-|                      | Zen | MEE6 | DraftBot | Koya |
-|----------------------|:---:|:----:|:--------:|:----:|
-| 100% free            |  ✅  |  ❌   |    ❌     |  ❌   |
-| Open source          |  ✅  |  ❌   |    ❌     |  ❌   |
-| Self-hostable        |  ✅  |  ❌   |    ❌     |  ❌   |
-| Built with Rust 🦀   |  ✅  |  ❌   |    ❌     |  ❌   |
-| No ads or promotions |  ✅  |  ❌   |    ❌     |  ❌   |
-| All-in-one           |  ✅  |  ⚠️  |    ⚠️    |  ⚠️  |
+Zen is built around a few non-negotiable principles:
 
----
-
-## 🛠️ Self-Hosting
-
-### Prerequisites
-
-- [Rust](https://rustup.rs/) (latest stable)
-- A PostgreSQL database
-- A Discord application with a bot token
-- A [Lavalink](https://github.com/lavalink-devs/Lavalink) instance (for music)
-
-### Quick Start
-
-```bash
-git clone https://github.com/t-aize/zen.git
-cd zen
-
-cp .env.example .env
-# Edit .env with your values
-
-cargo build --release
-cargo run --release
-```
-
-### Environment Variables
-
-```env
-DISCORD_TOKEN=your_bot_token
-CLIENT_ID=your_application_id
-DATABASE_URL=postgresql://user:password@localhost:5432/zen
-LAVALINK_HOST=localhost
-LAVALINK_PASSWORD=youshallnotpass
-```
+- **One platform, many modules**
+- **No premium-only core features**
+- **Clear permissions and auditability**
+- **Production-first reliability**
+- **Self-hosting as a first-class use case**
+- **Composable architecture over monolithic spaghetti**
 
 ---
 
-## 🤝 Contributing
+## Scalability Strategy
 
-Any contribution is welcome and appreciated!
+Zen is designed to scale progressively:
 
-1. Fork the repository
-2. Create your feature branch — `git checkout -b feature/my-feature`
-3. Commit your changes — `git commit -m 'feat: add my feature'`
-4. Push to your branch — `git push origin feature/my-feature`
-5. Open a Pull Request
+### Stage 1 — Single Instance (Small/Medium Servers)
+- One bot process
+- One API process
+- One database
+- Optional Redis
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting.
+### Stage 2 — Multi-Process / Multi-Service
+- Sharded bot gateway workers
+- Separate API service
+- Separate worker service
+- Redis required
+- Central database
+
+### Stage 3 — Horizontal Scale (Large Deployment)
+- Multiple shard groups
+- Dedicated queue workers
+- Dedicated audio infrastructure
+- Read replicas / optimized DB tuning
+- Full metrics + alerting stack
 
 ---
 
-## 📜 License
+## Security Model (High-Level)
 
-Distributed under the **Apache License 2.0**. See [LICENSE](LICENSE) for more information.
+Zen is built with a security-first mindset:
+
+- Least-privilege bot permissions
+- Strict guild admin checks in dashboard
+- Role/permission-aware settings access
+- Input validation at API and command boundaries
+- Rate limiting for abuse-prone endpoints
+- Secure secret management (no hardcoded tokens)
+- Audit trails for sensitive actions
+- Safe defaults for anti-raid and automod features
+
+---
+
+## Multilingual Design
+
+Zen treats localization as a platform feature, not an afterthought.
+
+### Goals
+- Localized slash command names/descriptions where supported
+- Localized runtime responses
+- Shared translation keys across bot + dashboard
+- Per-guild language selection
+- Fallback language behavior
+- Contributor-friendly translation workflow
+
+This avoids fragmented translations and inconsistent UX between modules.
+
+---
+
+## Open Source & Self-Hosting
+
+Zen is built for communities that want control.
+
+### Why self-host Zen?
+- Full control over your infrastructure
+- No feature paywalls
+- Custom extensions and integrations
+- Better transparency and privacy
+- Suitable for hobby projects and serious deployments
+
+### Open-source goals
+- readable codebase
+- modular contribution model
+- clear standards and docs
+- predictable release process
+
+---
+
+## Development Philosophy
+
+Zen is not meant to be a “quick script bot.”
+
+It is a **platform**:
+- modular
+- testable
+- observable
+- maintainable
+- deployable
+
+The goal is to build something that admins can trust on real communities.
+
+---
+
+## Status
+
+> **Project status:** In active development (early stage)
+
+Zen is currently being built with a production-ready foundation in mind.  
+Core architecture and platform decisions are prioritized before feature expansion.
+
+---
+
+## Roadmap (Example)
+
+- [ ] Core bot runtime (gateway, commands, permissions, i18n)
+- [ ] Guild configuration system
+- [ ] Moderation module (warn/timeout/ban/logs)
+- [ ] Anti-raid / automod protections
+- [ ] Ticket system
+- [ ] Dashboard authentication + guild settings pages
+- [ ] Leveling / rewards module
+- [ ] Music subsystem
+- [ ] Metrics / health checks / observability
+- [ ] Public plugin/module API (long-term)
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+Zen aims to be a clean and serious open-source project, so contributions should follow:
+- coding standards
+- testing expectations
+- security review where relevant
+- documentation updates for behavior changes
+
+Please open an issue first for major changes to discuss architecture and scope.
+
+---
+
+## License
+
+Zen is open-source under the **Apache-2.0 License** (recommended for projects of this type).
+
+---
+
+## Disclaimer
+
+Zen is an independent open-source project and is **not affiliated with Discord** or with any third-party bot brands/services.
+
+Zen may provide features commonly found across the Discord bot ecosystem, but it is built as its own platform.
 
 ---
 
 <div align="center">
 
-*Built with ❤️ and 🦀 for the Discord community.*
-
-**[⭐ Star this repo](https://github.com/t-aize/zen)** if Zen helps your community!
+### Zen — Simply powerful, purely open-source.
 
 </div>

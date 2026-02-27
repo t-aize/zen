@@ -1,26 +1,37 @@
-/target
-Cargo.lock
+# dependencies (bun install)
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
 .env
-.env.*
-!.env.example
-*.log
-logs/
-*.db
-*.sqlite
-*.sqlite3
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
 .DS_Store
-.DS_Store?
-Thumbs.db
-Desktop.ini
-.vscode/
-!.vscode/extensions.json
-!.vscode/settings.json
-.idea/
-*.swp
-*.swo
-*~
-/dist
-/build
-*.pid
-.dockerignore
-docker-compose.override.yml
+
+# Database files
+*.db
