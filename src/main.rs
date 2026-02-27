@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
         .compact()
         .init();
 
-    commands::ping::init_start_time();
+    commands::init();
 
     let config = Config::from_env()?;
 
