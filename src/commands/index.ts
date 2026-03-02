@@ -1,11 +1,12 @@
-import {pingCommand} from "@zen/commands/ping";
-import type {AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder,} from "discord.js";
+import { logger } from "@zen/src/logger";
+import {
+	type AutocompleteInteraction,
+	type ChatInputCommandInteraction,
+	Collection,
+	type SlashCommandBuilder,
+} from "discord.js";
 
-/** Minimum command name length per Discord API. */
-const MIN_COMMAND_NAME_LENGTH = 1;
-
-/** Maximum command name length per Discord API. */
-const MAX_COMMAND_NAME_LENGTH = 32;
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 /**
  * Logical groupings for commands.
@@ -44,29 +45,29 @@ const MAX_COMMAND_NAME_LENGTH = 32;
  * - `dev`          — Eval, reload, sync, debug, feature flags (development only).
  */
 export type CommandCategory =
-    | "moderation"
-    | "automod"
-    | "antiraid"
-    | "tickets"
-    | "music"
-    | "leveling"
-    | "utility"
-    | "server"
-    | "user"
-    | "welcome"
-    | "roles"
-    | "giveaways"
-    | "fun"
-    | "config"
-    | "permissions"
-    | "logging"
-    | "scheduler"
-    | "custom"
-    | "dashboard"
-    | "stats"
-    | "system"
-    | "owner"
-    | "dev";
+	| "moderation"
+	| "automod"
+	| "antiraid"
+	| "tickets"
+	| "music"
+	| "leveling"
+	| "utility"
+	| "server"
+	| "user"
+	| "welcome"
+	| "roles"
+	| "giveaways"
+	| "fun"
+	| "config"
+	| "permissions"
+	| "logging"
+	| "scheduler"
+	| "custom"
+	| "dashboard"
+	| "stats"
+	| "system"
+	| "owner"
+	| "dev";
 
 /**
  * Represents a fully-defined slash command.
@@ -95,106 +96,178 @@ export type CommandCategory =
  * ```
  */
 export interface Command {
-    /** Slash command definition (name, description, options). */
-    readonly data: SlashCommandBuilder;
+	/** Slash command definition (name, description, options). */
+	readonly data: SlashCommandBuilder;
 
-    /** The category this command belongs to. */
-    readonly category: CommandCategory;
+	/** The category this command belongs to. */
+	readonly category: CommandCategory;
 
-    /**
-     * Executes the command logic.
-     *
-     * @param interaction - The chat input command interaction from Discord.
-     * @returns A promise that resolves when execution completes.
-     *
-     * @throws If the command fails, the error is caught by the interaction
-     * handler and logged. An ephemeral error message is sent to the user.
-     */
-    execute(interaction: ChatInputCommandInteraction): Promise<void>;
+	/**
+	 * Executes the command logic.
+	 *
+	 * @param interaction - The chat input command interaction from Discord.
+	 * @returns A promise that resolves when execution completes.
+	 *
+	 * @throws If the command fails, the error is caught by the interaction
+	 * handler and logged. An ephemeral error message is sent to the user.
+	 */
+	readonly execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 
-    /**
-     * Handles autocomplete requests for this command.
-     *
-     * Only required if the command has options with `autocomplete: true`.
-     *
-     * @param interaction - The autocomplete interaction from Discord.
-     * @returns A promise that resolves when suggestions are sent.
-     */
-    autocomplete?(interaction: AutocompleteInteraction): Promise<void>;
+	/**
+	 * Handles autocomplete requests for this command.
+	 *
+	 * Only required if the command has options with `autocomplete: true`.
+	 *
+	 * @param interaction - The autocomplete interaction from Discord.
+	 * @returns A promise that resolves when suggestions are sent.
+	 */
+	readonly autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
 }
 
+// ─── Registry ────────────────────────────────────────────────────────────────
+
 /**
- * Global registry of all registered commands.
+ * Public read-only command map.
  *
- * Commands must be defined using {@link defineCommand} to ensure validation
- * and immutability. This array is used by the command handler to register
- * commands with Discord and route interactions to the correct handlers.
+ * Provides O(1) lookup by command name for the interaction handler
+ * to route incoming interactions to the correct command.
  *
- * @remarks
- * - The order of commands in this array does not affect functionality.
- * - All commands should be imported and included here for registration.
+ * @example
+ * ```ts
+ * const cmd = commandMap.get(interaction.commandName);
+ * if (cmd) await cmd.execute(interaction);
+ * ```
  */
-export const commands: readonly Command[] = [pingCommand];
+export const commandMap = new Collection<string, Readonly<Command>>();
+
+// ─── defineCommand ───────────────────────────────────────────────────────────
 
 /**
  * Validates and registers a command in the global registry.
  *
  * Performs the following validations:
- * - Command name is valid (1-32 lowercase chars, no spaces).
- * - No duplicate command names.
- * - Cooldown duration is within bounds.
- * - Autocomplete handler exists if options require it.
+ * 1. Command name matches the Discord-compliant pattern (1-32 lowercase, digits, `-`, `_`).
+ * 2. Command description length is within 1-100 characters.
+ * 3. No duplicate command names in the registry.
+ * 4. Autocomplete handler exists if any option declares `autocomplete: true`.
  *
  * @param command - The command definition to register.
  * @returns The registered command (frozen to prevent mutation).
  *
- * @throws {Error} If validation fails.
+ * @throws {Error} If any validation rule is violated.
  *
  * @example
  * ```ts
- * export default defineCommand({
+ * export const helpCommand = defineCommand({
  *   data: new SlashCommandBuilder()
  *     .setName("help")
  *     .setDescription("Shows help information"),
- *   meta: { category: "utility" },
+ *   category: "utility",
  *   async execute(interaction) {
  *     await interaction.reply("Here's some help!");
  *   },
  * });
  * ```
  */
-export function defineCommand(command: Command): Readonly<Command> {
-    const name = command.data.name.trim();
+export const defineCommand = (command: Command): Readonly<Command> => {
+	const name = command.data.name;
+	const description = command.data.description;
 
-    // Validate command name format
-    if (name.length < MIN_COMMAND_NAME_LENGTH || name.length > MAX_COMMAND_NAME_LENGTH) {
-        throw new Error(
-            `Command name "${name}" must be between ${MIN_COMMAND_NAME_LENGTH} and ${MAX_COMMAND_NAME_LENGTH} characters.`,
-        );
-    }
+	// ─── Discord API Constraints ─────────────────────────────────────────────────
 
-    if (name !== name.toLowerCase()) {
-        throw new Error(
-            `Command name "${name}" must be lowercase. Use "${name.toLowerCase()}" instead.`,
-        );
-    }
+	/** Minimum command name length per Discord API. */
+	const MIN_NAME_LENGTH = 1;
 
-    if (/\s/.test(name)) {
-        throw new Error(`Command name "${name}" cannot contain whitespace.`);
-    }
+	/** Maximum command name length per Discord API. */
+	const MAX_NAME_LENGTH = 32;
 
-    // Validate autocomplete handler presence
-    const options = "options" in command.data ? command.data.options : [];
-    const hasAutocompleteOption = options.some(
-        (opt) => "autocomplete" in opt && opt.autocomplete === true,
-    );
+	/** Minimum command description length per Discord API. */
+	const MIN_DESCRIPTION_LENGTH = 1;
 
-    if (hasAutocompleteOption && !command.autocomplete) {
-        throw new Error(
-            `Command "${name}" has autocomplete options but no autocomplete handler defined.`,
-        );
-    }
+	/** Maximum command description length per Discord API. */
+	const MAX_DESCRIPTION_LENGTH = 100;
 
-    // Freeze to prevent accidental mutation
-    return Object.freeze(command);
-}
+	/**
+	 * Discord-compliant command name pattern.
+	 *
+	 * Matches 1-32 characters that are lowercase letters (Unicode-aware),
+	 * digits, hyphens, or underscores. This follows the official Discord API
+	 * specification for `CHAT_INPUT` command names.
+	 *
+	 * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming
+	 */
+	const COMMAND_NAME_REGEX = /^[\p{Ll}\p{N}_-]+$/u;
+
+	// ── Name validation ──────────────────────────────────────────────
+
+	if (name.length < MIN_NAME_LENGTH || name.length > MAX_NAME_LENGTH) {
+		throw new Error(
+			`Command name "${name}" must be between ${MIN_NAME_LENGTH} and ${MAX_NAME_LENGTH} characters (got ${name.length}).`,
+		);
+	}
+
+	if (!COMMAND_NAME_REGEX.test(name)) {
+		throw new Error(
+			`Command name "${name}" contains invalid characters. ` +
+				`Only lowercase letters, digits, hyphens, and underscores are allowed.`,
+		);
+	}
+
+	// ── Description validation ───────────────────────────────────────
+
+	if (description.length < MIN_DESCRIPTION_LENGTH || description.length > MAX_DESCRIPTION_LENGTH) {
+		throw new Error(
+			`Command "${name}" description must be between ${MIN_DESCRIPTION_LENGTH} and ${MAX_DESCRIPTION_LENGTH} characters (got ${description.length}).`,
+		);
+	}
+
+	// ── Duplicate detection ──────────────────────────────────────────
+
+	if (commandMap.has(name)) {
+		throw new Error(
+			`Duplicate command name "${name}". A command with this name is already registered.`,
+		);
+	}
+
+	// ── Autocomplete handler presence ────────────────────────────────
+
+	const options = "options" in command.data ? command.data.options : [];
+	const hasAutocompleteOption = options.some(
+		(opt) => "autocomplete" in opt && opt.autocomplete === true,
+	);
+
+	if (hasAutocompleteOption && !command.autocomplete) {
+		throw new Error(
+			`Command "${name}" has autocomplete options but no autocomplete handler defined.`,
+		);
+	}
+
+	// ── Register & freeze ────────────────────────────────────────────
+
+	const frozen = Object.freeze(command);
+	commandMap.set(name, frozen);
+
+	logger.debug({ command: name, category: command.category }, "Command registered");
+
+	return frozen;
+};
+
+// ─── loadCommands ─────────────────────────────────────────────────────────────
+
+/**
+ * Dynamically imports and registers every command module.
+ *
+ * Each module calls {@link defineCommand} at the top level, which
+ * populates {@link commandMap}. Using dynamic `import()` guarantees
+ * that the registry is fully initialised before any command tries
+ * to register itself — no circular-init issues.
+ *
+ * **Must be called once at startup**, before the client logs in.
+ *
+ * @returns The populated command map for convenience.
+ */
+export const loadCommands = async (): Promise<void> => {
+	await import("@zen/commands/utility/ping");
+
+	logger.info({ commands: commandMap.size }, "Commands loaded");
+};

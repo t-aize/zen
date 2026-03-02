@@ -1,26 +1,67 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
-		"useIgnoreFile": true
+		"useIgnoreFile": true,
+		"defaultBranch": "main"
 	},
 	"files": {
-		"includes": ["**", "!!**/dist"]
+		"includes": ["src/**"],
+		"ignoreUnknown": true,
+		"maxSize": 2097152
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 100,
+		"lineEnding": "lf"
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double"
+			"recommended": true,
+			"correctness": {
+				"noUnusedImports": "error",
+				"noUnusedVariables": "error",
+				"noUnusedFunctionParameters": "warn",
+				"noUnusedPrivateClassMembers": "error"
+			},
+			"style": {
+				"noNonNullAssertion": "warn",
+				"useCollapsedElseIf": "error",
+				"useConsistentBuiltinInstantiation": "error",
+				"useDefaultSwitchClause": "warn",
+				"useExplicitLengthCheck": "error",
+				"useForOf": "error",
+				"useThrowNewError": "error",
+				"useArrayLiterals": "error"
+			},
+			"suspicious": {
+				"noConsole": "info",
+				"noEmptyBlockStatements": "error",
+				"noEvolvingTypes": "error",
+				"useAwait": "error"
+			},
+			"complexity": {
+				"noExcessiveCognitiveComplexity": {
+					"level": "warn",
+					"options": {
+						"maxAllowedComplexity": 20
+					}
+				},
+				"noExcessiveNestedTestSuites": "error",
+				"useDateNow": "error",
+				"useSimplifiedLogicExpression": "error"
+			},
+			"performance": {
+				"noBarrelFile": "error",
+				"noReExportAll": "error"
+			},
+			"nursery": {
+				"noFloatingPromises": "error"
+			}
 		}
 	},
 	"assist": {
@@ -30,5 +71,35 @@
 				"organizeImports": "on"
 			}
 		}
-	}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"trailingCommas": "all",
+			"semicolons": "always",
+			"arrowParentheses": "always",
+			"bracketSameLine": false
+		},
+		"parser": {
+			"jsxEverywhere": false
+		},
+		"globals": ["NodeJS"]
+	},
+	"json": {
+		"formatter": {
+			"trailingCommas": "none"
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.test.ts", "**/*.spec.ts"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noConsole": "off"
+					}
+				}
+			}
+		}
+	]
 }

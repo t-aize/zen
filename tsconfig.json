@@ -18,7 +18,6 @@
 		"sourceMap": true,
 		"stripInternal": true,
 		"strict": true,
-		"allowJs": true,
 		"noUncheckedIndexedAccess": true,
 		"noFallthroughCasesInSwitch": true,
 		"noPropertyAccessFromIndexSignature": true,

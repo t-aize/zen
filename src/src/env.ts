@@ -50,18 +50,15 @@ export type Env = z.infer<typeof envSchema>;
  * This runs **once** at import time — any module importing `env`
  * is guaranteed to receive a fully validated, typed object.
  */
-function validateEnv(): Env {
+const validateEnv = (): Env => {
 	const result = envSchema.safeParse(process.env);
 
 	if (!result.success) {
-		console.error("❌ Invalid environment variables:\n");
-		console.error(z.prettifyError(result.error));
-		console.error("\nPlease check your .env file against .env.example");
-		process.exit(1);
+		throw result.error;
 	}
 
 	return result.data;
-}
+};
 
 /** Validated and typed environment variables. */
 export const env = validateEnv();
