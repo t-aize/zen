@@ -267,6 +267,7 @@ export const defineCommand = (command: Command): Readonly<Command> => {
  * @returns The populated command map for convenience.
  */
 export const loadCommands = async (): Promise<void> => {
+	await import("@zen/commands/moderation/clear");
 	await import("@zen/commands/utility/ping");
 
 	logger.info({ commands: commandMap.size }, "Commands loaded");
