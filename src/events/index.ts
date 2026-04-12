@@ -117,6 +117,7 @@ export const loadEvents = async (client: Client): Promise<void> => {
 	await import("@zen/events/client/ready");
 	await import("@zen/events/client/interactionCreate");
 	await import("@zen/events/client/channelCreate");
+	await import("@zen/events/client/guildAvailable");
 
 	for (const event of registry) {
 		if (event.once) {
