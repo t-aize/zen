@@ -1,4 +1,4 @@
-import { logger } from "@zen/src/logger";
+import { logger } from "@zen/utils/logger";
 import type { Client, ClientEvents } from "discord.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -7,7 +7,7 @@ import type { Client, ClientEvents } from "discord.js";
  * Represents a fully-defined event listener.
  *
  * Each event consists of:
- * - `name`     — The Discord.js client event name (e.g. `"ready"`, `"messageCreate"`).
+ * - `name`     — The Discord.js client event name (e.g. `"clientReady"`, `"messageCreate"`).
  * - `once`     — Whether the listener fires only once or on every emission.
  * - `execute`  — The async function invoked when the event fires.
  *
@@ -20,7 +20,7 @@ import type { Client, ClientEvents } from "discord.js";
  * import { defineEvent } from "@zen/events";
  *
  * export const readyEvent = defineEvent({
- *   name: "ready",
+ *   name: "clientReady",
  *   once: true,
  *   async execute(client) {
  *     console.log(`Logged in as ${client.user.tag}`);
@@ -53,7 +53,7 @@ export interface Event<E extends keyof ClientEvents = keyof ClientEvents> {
  * Internal event registry populated by {@link defineEvent}.
  * Each entry is a frozen event bound to the client at load time.
  */
-const registry: Readonly<Event<keyof ClientEvents>>[] = [];
+const registry: Readonly<Event>[] = [];
 
 // ─── defineEvent ─────────────────────────────────────────────────────────────
 
@@ -93,7 +93,7 @@ export const defineEvent = <E extends keyof ClientEvents>(event: Event<E>): Read
 	}
 
 	const frozen = Object.freeze(event);
-	registry.push(frozen as unknown as Readonly<Event<keyof ClientEvents>>);
+	registry.push(frozen as unknown as Readonly<Event>);
 
 	logger.debug({ event: name, once: event.once ?? false }, "Event registered");
 
@@ -116,6 +116,7 @@ export const defineEvent = <E extends keyof ClientEvents>(event: Event<E>): Read
 export const loadEvents = async (client: Client): Promise<void> => {
 	await import("@zen/events/client/ready");
 	await import("@zen/events/client/interactionCreate");
+	await import("@zen/events/client/channelCreate");
 
 	for (const event of registry) {
 		if (event.once) {

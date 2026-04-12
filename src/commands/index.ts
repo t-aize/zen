@@ -1,4 +1,4 @@
-import { logger } from "@zen/src/logger";
+import { logger } from "@zen/utils/logger";
 import {
 	type AutocompleteInteraction,
 	type ChatInputCommandInteraction,

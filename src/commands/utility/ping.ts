@@ -1,23 +1,24 @@
 import os from "node:os";
+
 import { defineCommand } from "@zen/commands";
 import {
 	ActionRowBuilder,
 	ApplicationIntegrationType,
-	ButtonBuilder,
-	ButtonStyle,
 	blockQuote,
 	bold,
+	ButtonBuilder,
+	ButtonStyle,
 	type Client,
 	ComponentType,
-	version as djsVersion,
 	EmbedBuilder,
-	InteractionContextType,
 	inlineCode,
+	InteractionContextType,
 	italic,
 	MessageFlags,
 	SlashCommandBuilder,
-	TimestampStyles,
 	time,
+	TimestampStyles,
+	version as djsVersion,
 } from "discord.js";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -135,7 +136,7 @@ const collectDiagnostics = (client: Client<true>, roundTripMs: number): Diagnost
 		roundTripLatency: roundTripMs,
 		shardId: client.ws.shards.first()?.id ?? 0,
 		shardCount: client.ws.shards.size,
-		uptime: formatDuration(client.uptime ?? 0),
+		uptime: formatDuration(client.uptime),
 		guildCount: client.guilds.cache.size,
 		userCount: client.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0),
 		channelCount: client.channels.cache.size,
@@ -290,9 +291,9 @@ defineCommand({
 		let roundTripMs = Date.now() - start;
 
 		let refreshCount = 0;
-		const avatarUrl = interaction.client.user?.displayAvatarURL({ size: 256 });
+		const avatarUrl = interaction.client.user.displayAvatarURL({ size: 256 });
 
-		const snapshot = collectDiagnostics(interaction.client as Client<true>, roundTripMs);
+		const snapshot = collectDiagnostics(interaction.client, roundTripMs);
 
 		const reply = await interaction.editReply({
 			embeds: [buildPingEmbed(snapshot, refreshCount, avatarUrl)],
@@ -310,10 +311,7 @@ defineCommand({
 		collector.on("collect", async (buttonInteraction) => {
 			refreshCount++;
 
-			const preliminarySnapshot = collectDiagnostics(
-				interaction.client as Client<true>,
-				roundTripMs,
-			);
+			const preliminarySnapshot = collectDiagnostics(interaction.client, roundTripMs);
 
 			const refreshStart = Date.now();
 			await buttonInteraction.update({
@@ -322,7 +320,7 @@ defineCommand({
 			});
 			roundTripMs = Date.now() - refreshStart;
 
-			const measuredSnapshot = collectDiagnostics(interaction.client as Client<true>, roundTripMs);
+			const measuredSnapshot = collectDiagnostics(interaction.client, roundTripMs);
 
 			await interaction.editReply({
 				embeds: [buildPingEmbed(measuredSnapshot, refreshCount, avatarUrl)],
@@ -331,7 +329,7 @@ defineCommand({
 		});
 
 		collector.on("end", async () => {
-			const finalSnapshot = collectDiagnostics(interaction.client as Client<true>, roundTripMs);
+			const finalSnapshot = collectDiagnostics(interaction.client, roundTripMs);
 
 			await interaction
 				.editReply({

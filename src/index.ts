@@ -1,7 +1,8 @@
 import { loadCommands } from "@zen/commands";
+import { checkDatabaseConnection, closeDatabaseConnection } from "@zen/db";
 import { loadEvents } from "@zen/events";
-import { env } from "@zen/src/env";
-import { logger } from "@zen/src/logger";
+import { env } from "@zen/utils/env";
+import { logger } from "@zen/utils/logger";
 import { ActivityType, Client, GatewayIntentBits, Options, Partials } from "discord.js";
 
 /**
@@ -218,8 +219,7 @@ const client = new Client({
  * Execution order matters — resources are released
  * from the outermost (Discord) to the innermost (database):
  * 1. Destroy the Discord WebSocket connection.
- * 2. Disconnect Redis.
- * 3. Close the PostgreSQL connection pool.
+ * 2. Close the PostgreSQL connection pool.
  *
  * @param signal - The POSIX signal that triggered the shutdown.
  */
@@ -227,13 +227,18 @@ const shutdown = async (signal: string): Promise<void> => {
 	logger.info({ signal }, "Shutting down...");
 
 	await client.destroy();
+	await closeDatabaseConnection();
 
 	logger.info("Shutdown complete");
 	process.exit(0);
 };
 
-process.on("SIGINT", () => shutdown("SIGINT"));
-process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => {
+	void shutdown("SIGINT");
+});
+process.on("SIGTERM", () => {
+	void shutdown("SIGTERM");
+});
 
 process.on("unhandledRejection", (error) => {
 	logger.fatal({ error }, "Unhandled promise rejection");
@@ -255,20 +260,16 @@ process.on("uncaughtException", (error) => {
 const main = async (): Promise<void> => {
 	logger.info({ env: env.NODE_ENV, logLevel: env.LOG_LEVEL }, "Starting Zen...");
 
-	// ── Load commands ────────────────────────────────────────────────
+	// ── Load application modules and infrastructure ─────────────────
 
-	await loadCommands();
-
-	// ── Load events ─────────────────────────────────────────────────
-
-	await loadEvents(client);
+	await Promise.all([loadCommands(), loadEvents(client), checkDatabaseConnection()]);
 
 	// ── Authenticate with the Discord gateway ────────────────────────
 
 	await client.login(env.DISCORD_TOKEN);
 };
 
-main().catch((error) => {
+void main().catch((error: unknown) => {
 	logger.fatal({ error }, "Failed to start Zen");
 	process.exit(1);
 });

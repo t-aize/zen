@@ -1,4 +1,4 @@
-import { env } from "@zen/src/env";
+import { env } from "@zen/utils/env";
 import pino from "pino";
 
 const isProduction = env.NODE_ENV === "production";

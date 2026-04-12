@@ -1,4 +1,5 @@
 import "dotenv/config";
+
 import { z } from "zod";
 
 /**
@@ -23,8 +24,11 @@ const envSchema = z.object({
 	/** Application ID from the Discord Developer Portal. */
 	DISCORD_CLIENT_ID: z.string().min(1, { error: "DISCORD_CLIENT_ID is required" }),
 
-	/** SQLite connection string (e.g. `file:./local.db`). */
-	DATABASE_URL: z.url({ error: "DATABASE_URL must be a valid URL" }),
+	/** PostgreSQL connection string (e.g. `postgresql://postgres:postgres@localhost:5432/zen`). */
+	DATABASE_URL: z.url({ error: "DATABASE_URL must be a valid PostgreSQL URL" }).refine((value) => {
+		const protocol = new URL(value).protocol;
+		return protocol === "postgres:" || protocol === "postgresql:";
+	}, "DATABASE_URL must use postgres:// or postgresql://"),
 
 	/** Pino log level. Defaults to `"info"`. */
 	LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),

@@ -1,25 +1,25 @@
 import { defineCommand } from "@zen/commands";
-import { createLogger } from "@zen/src/logger";
+import { createLogger } from "@zen/utils/logger";
 import {
 	ActionRowBuilder,
 	ApplicationIntegrationType,
-	ButtonBuilder,
-	ButtonStyle,
 	blockQuote,
 	bold,
+	ButtonBuilder,
+	ButtonStyle,
 	Collection,
 	ComponentType,
 	EmbedBuilder,
 	escapeMarkdown,
-	InteractionContextType,
 	inlineCode,
+	InteractionContextType,
 	italic,
 	type Message,
 	MessageFlags,
 	PermissionFlagsBits,
 	SlashCommandBuilder,
-	TimestampStyles,
 	time,
+	TimestampStyles,
 	type User,
 } from "discord.js";
 
@@ -69,6 +69,7 @@ interface ClearOptions {
 	readonly targetUser: User | null;
 	readonly includePinned: boolean;
 	readonly reason: string | null;
+	readonly skipConfirmation: boolean;
 }
 
 interface ClearPreview {
@@ -120,17 +121,20 @@ const buildChannelUrl = (guildId: string, channelId: string): string =>
 const isBulkDeleteCapableChannel = (channel: unknown): channel is BulkDeleteCapableChannel => {
 	if (typeof channel !== "object" || channel === null) return false;
 	if (!("isTextBased" in channel) || typeof channel.isTextBased !== "function") return false;
-	if (!channel.isTextBased()) return false;
-	if (!("bulkDelete" in channel) || typeof channel.bulkDelete !== "function") return false;
-	if (
-		!("messages" in channel) ||
-		typeof channel.messages !== "object" ||
-		channel.messages === null
-	) {
+
+	const candidate = channel as {
+		bulkDelete?: unknown;
+		isTextBased: () => boolean;
+		messages?: unknown;
+	};
+
+	if (!candidate.isTextBased()) return false;
+	if (typeof candidate.bulkDelete !== "function") return false;
+	if (typeof candidate.messages !== "object" || candidate.messages === null) {
 		return false;
 	}
 
-	return "fetch" in channel.messages && typeof channel.messages.fetch === "function";
+	return "fetch" in candidate.messages && typeof candidate.messages.fetch === "function";
 };
 
 const collectClearPreview = async (
@@ -446,6 +450,34 @@ const buildFailureEmbed = (
 		.setTimestamp(new Date());
 };
 
+const executeBulkDelete = async (
+	channel: BulkDeleteCapableChannel,
+	interaction: { guildId: string; user: { id: string } },
+	options: ClearOptions,
+	preview: ClearPreview,
+): Promise<number> => {
+	const deletedMessages = await channel.bulkDelete(preview.selectedMessages, true);
+	const deletedCount = deletedMessages.size;
+
+	log.info(
+		{
+			guild: interaction.guildId,
+			channel: channel.id,
+			moderator: interaction.user.id,
+			amountRequested: options.amount,
+			previewed: preview.selectedMessages.size,
+			deleted: deletedCount,
+			targetUser: options.targetUser?.id,
+			includePinned: options.includePinned,
+			reason: options.reason,
+			skipConfirmation: options.skipConfirmation,
+		},
+		"Bulk delete completed",
+	);
+
+	return deletedCount;
+};
+
 // ─── Action Row ──────────────────────────────────────────────────────────────
 
 const buildActionRow = (
@@ -516,6 +548,12 @@ defineCommand({
 				.setDescription("Include pinned messages in the purge scope")
 				.setRequired(false),
 		)
+		.addBooleanOption((option) =>
+			option
+				.setName("skip-confirmation")
+				.setDescription("Delete immediately without the confirmation step")
+				.setRequired(false),
+		)
 		.addStringOption((option) =>
 			option
 				.setName("reason")
@@ -552,19 +590,22 @@ defineCommand({
 		}
 
 		const channel = interaction.channel;
-		const avatarUrl = interaction.client.user?.displayAvatarURL({ size: 256 });
+		const avatarUrl = interaction.client.user.displayAvatarURL({ size: 256 });
 		const moderatorLabel = interaction.user.toString();
+		const reason = interaction.options.getString("reason");
 		const options: ClearOptions = {
 			amount: interaction.options.getInteger("amount", true),
 			targetUser: interaction.options.getUser("user"),
 			includePinned: interaction.options.getBoolean("include-pinned") ?? false,
-			reason: interaction.options.getString("reason")?.trim() || null,
+			reason: reason?.trim() ? reason.trim() : null,
+			skipConfirmation: interaction.options.getBoolean("skip-confirmation") ?? false,
 		};
 
 		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-		const moderatorHasPermission =
-			interaction.memberPermissions?.has(PermissionFlagsBits.ManageMessages) ?? false;
+		const moderatorHasPermission = interaction.memberPermissions.has(
+			PermissionFlagsBits.ManageMessages,
+		);
 		if (!moderatorHasPermission) {
 			await interaction.editReply({
 				embeds: [
@@ -580,7 +621,7 @@ defineCommand({
 		}
 
 		const missingBotPermissions = REQUIRED_BOT_PERMISSIONS.filter(
-			(permission) => !(interaction.appPermissions?.has(permission.bit) ?? false),
+			(permission) => !interaction.appPermissions.has(permission.bit),
 		);
 		if (missingBotPermissions.length > 0) {
 			await interaction.editReply({
@@ -603,6 +644,66 @@ defineCommand({
 		const channelUrl = buildChannelUrl(interaction.guildId, channel.id);
 		let preview = await collectClearPreview(channel, options);
 		let terminalState: "active" | "confirmed" | "cancelled" | "failed" = "active";
+
+		if (options.skipConfirmation) {
+			if (preview.selectedMessages.size === 0) {
+				await interaction.editReply({
+					embeds: [
+						buildPreviewEmbed(
+							channel,
+							moderatorLabel,
+							options,
+							preview,
+							refreshCount,
+							sessionExpiresAt,
+							avatarUrl,
+						).setFooter(
+							buildFooter("Moderation  •  Direct execution found nothing eligible", avatarUrl),
+						),
+					],
+					components: [],
+				});
+				return;
+			}
+
+			try {
+				terminalState = "confirmed";
+
+				await interaction.editReply({
+					embeds: [buildProgressEmbed(channel, options, preview, avatarUrl)],
+					components: [],
+				});
+
+				const deletedCount = await executeBulkDelete(channel, interaction, options, preview);
+
+				await interaction.editReply({
+					embeds: [
+						buildResultEmbed(channel, moderatorLabel, options, preview, deletedCount, avatarUrl),
+					],
+					components: [],
+				});
+			} catch (error) {
+				terminalState = "failed";
+
+				log.error(
+					{
+						error,
+						guild: interaction.guildId,
+						channel: channel.id,
+						moderator: interaction.user.id,
+						skipConfirmation: options.skipConfirmation,
+					},
+					"Clear command direct execution failed",
+				);
+
+				await interaction.editReply({
+					embeds: [buildFailureEmbed(channel, moderatorLabel, options, avatarUrl)],
+					components: [],
+				});
+			}
+
+			return;
+		}
 
 		const reply = await interaction.editReply({
 			embeds: [
@@ -690,23 +791,7 @@ defineCommand({
 					],
 				});
 
-				const deletedMessages = await channel.bulkDelete(preview.selectedMessages, true);
-				const deletedCount = deletedMessages.size;
-
-				log.info(
-					{
-						guild: interaction.guildId,
-						channel: channel.id,
-						moderator: interaction.user.id,
-						amountRequested: options.amount,
-						previewed: preview.selectedMessages.size,
-						deleted: deletedCount,
-						targetUser: options.targetUser?.id,
-						includePinned: options.includePinned,
-						reason: options.reason,
-					},
-					"Bulk delete completed",
-				);
+				const deletedCount = await executeBulkDelete(channel, interaction, options, preview);
 
 				await interaction.editReply({
 					embeds: [

@@ -1,0 +1,10 @@
+.git
+.gitignore
+.husky
+.idea
+node_modules
+dist
+.env
+pnpm-debug.log
+npm-debug.log
+yarn-error.log
