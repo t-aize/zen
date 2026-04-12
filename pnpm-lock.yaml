@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@discordjs/voice':
         specifier: ^0.19.2
-        version: 0.19.2(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+        version: 0.19.2(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(bufferutil@4.1.0)
       discord.js:
         specifier: ^14.26.2
-        version: 14.26.2
+        version: 14.26.2(bufferutil@4.1.0)
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -87,6 +87,13 @@ importers:
       typescript-eslint:
         specifier: ^8.58.1
         version: 8.58.1(eslint@10.2.0)(typescript@5.9.3)
+    optionalDependencies:
+      bufferutil:
+        specifier: ^4.1.0
+        version: 4.1.0
+      zlib-sync:
+        specifier: ^0.1.10
+        version: 0.1.10
 
 packages:
 
@@ -881,6 +888,10 @@ packages:
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
+  bufferutil@4.1.0:
+    resolution: {integrity: sha512-ZMANVnAixE6AWWnPzlW2KpUrxhm9woycYvPOo67jWHyFowASTEd9s+QN1EIMsSDtwhIxN4sWE1jotpuDUIgyIw==}
+    engines: {node: '>=6.14.2'}
+
   cli-cursor@5.0.0:
     resolution: {integrity: sha512-aCj4O5wKyszjMmDT4tZj93kxyydN/K5zPWSCe6/0AV/AA1pqe5ZBIw0a2ZfPQV7lL5/yb5HsUreJ6UFAF1tEQw==}
     engines: {node: '>=18'}
@@ -1282,8 +1293,15 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
+  nan@2.26.2:
+    resolution: {integrity: sha512-0tTvBTYkt3tdGw22nrAy50x7gpbGCCFH3AFcyS5WiUu7Eu4vWlri1woE6qHBSfy11vksDqkiwjOnlR7WV8G1Hw==}
+
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
+
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
+    hasBin: true
 
   on-exit-leak-free@2.1.2:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
@@ -1611,6 +1629,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zlib-sync@0.1.10:
+    resolution: {integrity: sha512-t7/pYg5tLBznL1RuhmbAt8rNp5tbhr+TSrJFnMkRtrGIaPJZ6Dc0uR4u3OoQI2d6cGlVI62E3Gy6gwkxyIqr/w==}
+
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
@@ -1650,14 +1671,14 @@ snapshots:
     dependencies:
       discord-api-types: 0.38.45
 
-  '@discordjs/voice@0.19.2(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
+  '@discordjs/voice@0.19.2(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(bufferutil@4.1.0)':
     dependencies:
       '@snazzah/davey': 0.1.11(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
       '@types/ws': 8.18.1
       discord-api-types: 0.38.45
       prism-media: 1.3.5
       tslib: 2.8.1
-      ws: 8.20.0
+      ws: 8.20.0(bufferutil@4.1.0)
     transitivePeerDependencies:
       - '@discordjs/opus'
       - '@emnapi/core'
@@ -1668,7 +1689,7 @@ snapshots:
       - opusscript
       - utf-8-validate
 
-  '@discordjs/ws@1.2.3':
+  '@discordjs/ws@1.2.3(bufferutil@4.1.0)':
     dependencies:
       '@discordjs/collection': 2.1.1
       '@discordjs/rest': 2.6.1
@@ -1678,7 +1699,7 @@ snapshots:
       '@vladfrangu/async_event_emitter': 2.4.7
       discord-api-types: 0.38.45
       tslib: 2.8.1
-      ws: 8.20.0
+      ws: 8.20.0(bufferutil@4.1.0)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -2214,6 +2235,11 @@ snapshots:
 
   buffer-from@1.1.2: {}
 
+  bufferutil@4.1.0:
+    dependencies:
+      node-gyp-build: 4.8.4
+    optional: true
+
   cli-cursor@5.0.0:
     dependencies:
       restore-cursor: 5.1.0
@@ -2243,14 +2269,14 @@ snapshots:
 
   discord-api-types@0.38.45: {}
 
-  discord.js@14.26.2:
+  discord.js@14.26.2(bufferutil@4.1.0):
     dependencies:
       '@discordjs/builders': 1.14.1
       '@discordjs/collection': 1.5.3
       '@discordjs/formatters': 0.6.2
       '@discordjs/rest': 2.6.1
       '@discordjs/util': 1.2.0
-      '@discordjs/ws': 1.2.3
+      '@discordjs/ws': 1.2.3(bufferutil@4.1.0)
       '@sapphire/snowflake': 3.5.3
       discord-api-types: 0.38.45
       fast-deep-equal: 3.1.3
@@ -2589,7 +2615,13 @@ snapshots:
 
   ms@2.1.3: {}
 
+  nan@2.26.2:
+    optional: true
+
   natural-compare@1.4.0: {}
+
+  node-gyp-build@4.8.4:
+    optional: true
 
   on-exit-leak-free@2.1.2: {}
 
@@ -2866,12 +2898,19 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@8.20.0: {}
+  ws@8.20.0(bufferutil@4.1.0):
+    optionalDependencies:
+      bufferutil: 4.1.0
 
   xtend@4.0.2: {}
 
   yaml@2.8.3: {}
 
   yocto-queue@0.1.0: {}
+
+  zlib-sync@0.1.10:
+    dependencies:
+      nan: 2.26.2
+    optional: true
 
   zod@4.3.6: {}

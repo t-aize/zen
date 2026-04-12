@@ -116,8 +116,10 @@ export const defineEvent = <E extends keyof ClientEvents>(event: Event<E>): Read
 export const loadEvents = async (client: Client): Promise<void> => {
 	await import("@zen/events/client/ready");
 	await import("@zen/events/client/interactionCreate");
-	await import("@zen/events/client/channelCreate");
 	await import("@zen/events/client/guildAvailable");
+	await import("@zen/events/channels/channelCreate");
+	await import("@zen/events/channels/channelDelete");
+	await import("@zen/events/channels/channelUpdate");
 
 	for (const event of registry) {
 		if (event.once) {
