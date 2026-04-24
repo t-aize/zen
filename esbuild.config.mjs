@@ -11,6 +11,7 @@ const ctx = await context({
   target: 'node24',
   packages: 'external',
   sourcemap: true,
+  legalComments: 'none',
   logLevel: 'info',
 });
 
