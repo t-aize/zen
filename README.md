@@ -2,13 +2,15 @@
 
 # 🧘 Zen
 
-### One platform. Multiple modules. Open-source. Self-hostable.
+### A clean, modular Discord bot built in TypeScript.
 
-**Zen** is a modular Discord platform built to unify moderation, tickets, music, leveling, utilities, anti-raid
-protection, automations, and server management inside a single ecosystem.
+**Zen** is an open-source Discord bot focused on moderation, utilities, tickets, automations, and server management.
 
-It is designed as a **workspace-based monorepo** with a **Discord bot runtime**, a **web dashboard**, shared internal
-packages, and optional background workers for scalable production deployments.
+For now, Zen is intentionally built as a **single-package project** with a simple `src/` architecture.  
+No workspace, no dashboard, no API service, no worker, no shared packages.
+
+The goal is to build a solid Discord bot first, then only move toward a larger monorepo if the project actually needs
+it.
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-Apache%202.0-green?style=for-the-badge)
@@ -23,19 +25,21 @@ packages, and optional background workers for scalable production deployments.
 
 - [Why Zen Exists](#why-zen-exists)
 - [What Zen Is](#what-zen-is)
+- [Current Scope](#current-scope)
 - [Core Capabilities](#core-capabilities)
 - [Architecture Overview](#architecture-overview)
-- [Workspace Structure](#workspace-structure)
+- [Project Structure](#project-structure)
+- [Command System](#command-system)
+- [Event System](#event-system)
 - [Module System](#module-system)
 - [Configuration Model](#configuration-model)
 - [Data & Persistence](#data--persistence)
-- [Deployment Modes](#deployment-modes)
 - [Security, Privacy & Reliability](#security-privacy--reliability)
-- [Observability & Operations](#observability--operations)
 - [Tech Stack](#tech-stack)
 - [Development Setup](#development-setup)
-- [Docker Compose](#docker-compose)
+- [Scripts](#scripts)
 - [Roadmap](#roadmap)
+- [Future Monorepo Direction](#future-monorepo-direction)
 - [Contributing](#contributing)
 - [Project Goals](#project-goals)
 - [Non-Goals](#non-goals)
@@ -46,601 +50,560 @@ packages, and optional background workers for scalable production deployments.
 
 ## Why Zen Exists
 
-Discord communities often stack multiple bots to cover moderation, tickets, music, reaction roles, XP systems,
-automations, logging, and anti-raid protection.
+Discord communities often stack multiple bots to handle moderation, tickets, utilities, anti-raid protection, role
+menus, logging, reminders, and automations.
 
-That usually leads to the same problems:
+That creates recurring problems:
 
-- fragmented configuration across multiple dashboards
-- inconsistent permissions and role access rules
-- overlapping or duplicated features
-- poor observability for moderators and admins
-- vendor lock-in or premium-gated core features
-- harder maintenance for communities that want control over their tooling
+- fragmented configuration
+- inconsistent permissions
+- duplicated features
+- poor visibility for moderators
+- unclear audit logs
+- premium-gated basic features
+- unnecessary dependency on third-party bots
 
-**Zen** exists to solve that by providing a **unified, modular, self-hostable platform** rather than another isolated
-single-purpose bot.
+**Zen** exists to provide a cleaner alternative: one maintainable Discord bot that can grow module by module.
 
-The goal is not to be a gimmick bot with a long feature list.  
-The goal is to build a platform that server admins can actually trust, operate, extend, and host.
+The goal is not to create a bloated mega-bot immediately.  
+The goal is to build a serious, self-hostable Discord bot with a clean internal structure.
 
 ---
 
 ## What Zen Is
 
-Zen is an **all-in-one Discord platform** that combines multiple common server functions inside one coherent system.
+Zen is a TypeScript Discord bot designed to be:
 
-It is designed to be:
+- **open-source**
+- **self-hostable**
+- **modular**
+- **maintainable**
+- **permission-aware**
+- **privacy-conscious**
+- **simple to run locally**
+- **ready to evolve without becoming spaghetti code**
 
-- **Open-source**
-- **Self-hostable**
-- **Modular**
-- **Extensible**
-- **Production-oriented**
-- **Privacy-conscious**
-- **Admin-friendly**
-- **Workspace-based from day one**
+Zen starts as a single runtime: the Discord bot.
 
-Zen is not meant to be a pile of commands glued together.  
-It is intended to be a maintainable platform with clear boundaries between runtime, modules, persistence,
-configuration, dashboard, and infrastructure.
+Later, the project may evolve toward a dashboard, API, workers, or a full monorepo.  
+But those are not part of the current architecture.
+
+---
+
+## Current Scope
+
+The current version of Zen focuses on a **simple single-package codebase**.
+
+### Included for now
+
+- Discord bot runtime
+- slash command system
+- event handlers
+- internal module organization
+- environment configuration
+- logging
+- basic permission helpers
+- moderation foundation
+- utility commands
+- optional database layer when persistence becomes necessary
+
+### Not included yet
+
+- web dashboard
+- API backend
+- background worker
+- pnpm workspace
+- Turbo monorepo
+- shared packages
+- dedicated music service
+- complex Docker production infrastructure
+- public plugin marketplace
+
+This is intentional.
+
+A project should not start with five applications if the first useful product is one Discord bot.
 
 ---
 
 ## Core Capabilities
 
-### 🛡️ Moderation & Enforcement
+Zen is designed to grow progressively.
 
-- ban / kick / timeout / unban workflows
-- warning system
-- bulk moderation actions
-- role and channel lockdown tools
-- mod logs and audit trails
-- reason tracking and case history
-- permission-safe moderation commands
-- future escalation policies
+### 🛡️ Moderation
 
-### 🚨 Anti-Raid & AutoMod
+Planned moderation features:
 
-- join flood detection
-- anti-spam protections
-- anti-mention spam
-- anti-link and anti-invite filtering
-- account age and server age gating
-- auto quarantine / verification flow
-- configurable protection thresholds
-- safe defaults for fast incident response
+- ban
+- kick
+- timeout
+- unban
+- warnings
+- moderation cases
+- mod logs
+- reason tracking
+- permission-safe moderation actions
 
-### 🎫 Tickets & Support
+### 🚨 Protection & Anti-Abuse
 
-- ticket panels and button-based flows
-- category and channel routing
-- claim / close / reopen / archive actions
-- staff visibility controls
-- transcript export
-- optional SLA-oriented workflows
-- future support analytics
+Planned protection features:
 
-### 🎵 Music
+- anti-spam
+- anti-link filtering
+- anti-invite filtering
+- mention spam detection
+- basic anti-raid rules
+- configurable thresholds
+- safe emergency lockdown commands
 
-- voice playback queue
-- play / pause / skip / stop / seek controls
-- queue management
-- loop modes
-- permission-aware voice controls
-- optional dedicated audio backend for larger deployments
+### 🎫 Tickets
 
-### 📈 Levels, Engagement & Community Features
+Planned ticket features:
 
-- XP and leveling
-- reward roles
-- rank display
-- configurable progression rules
-- anti-abuse safeguards
-- activity-based engagement systems
-- optional fun/community modules
+- ticket creation buttons
+- staff-only ticket channels
+- claim / close / reopen actions
+- transcript generation
+- ticket logs
+- category routing
 
-### ⚙️ Utilities & Server Management
+### ⚙️ Utilities
 
-- server info and user info
-- avatar / banner utilities
+Planned utility features:
+
+- ping
+- server info
+- user info
+- avatar
 - polls
 - reminders
 - embeds
-- custom commands
-- slash-first interaction model
-- configurable guild tools
+- role tools
 
-### 🧩 Roles, Menus & Community Automation
+### 🧩 Roles & Automation
+
+Planned role and automation features:
 
 - reaction roles
-- role menus
-- welcome / goodbye messages
+- button role menus
+- welcome messages
+- goodbye messages
 - auto-role assignment
 - scheduled announcements
-- recurring server tasks
-- simple automation primitives for common admin workflows
+- simple server automation rules
 
 ### 🌍 Internationalization
 
-- per-guild language selection
-- localized runtime responses
-- localized dashboard UI
-- localized command descriptions where supported
-- fallback language strategy
-- shared translation keys across services
+Potential future i18n support:
 
-### 🌐 Dashboard & Admin Experience
+- default language configuration
+- per-guild language
+- typed translation keys
+- fallback language
+- localized command responses
 
-- Discord OAuth2 authentication
-- guild-scoped admin access
-- centralized module configuration
-- role-aware settings pages
-- safer editing than command-only configuration
-- logs, health visibility, and future analytics
-
-### 🔐 Auth & Access Control
-
-- guild ownership and admin checks
-- dashboard authorization layer
-- permission-aware UI visibility
-- internal access rules for sensitive actions
-- future support for fine-grained role policy management
-
-### 🧵 Jobs & Background Processing
-
-- scheduled jobs
-- retryable background tasks
-- queue-driven workflows
-- transcript generation
-- maintenance jobs
-- future digest / batch / cleanup pipelines
-
-### 📊 Observability & Operations
-
-- health checks
-- structured logs
-- metrics exposure
-- audit events
-- operational diagnostics
-- future tracing support
-
-### 🔌 Integrations
-
-- Discord-native integrations first
-- webhook support
-- external service hooks
-- optional third-party connectors over time
-- internal event-driven integration points
+This is not a Phase 1 priority unless the bot quickly needs multilingual support.
 
 ---
 
 ## Architecture Overview
 
-Zen is designed as a **workspace-based platform** with clear boundaries between application runtimes and shared
-packages.
+Zen currently follows a **single-process bot architecture**.
 
-At a high level, Zen can include:
+```text
+Discord
+  │
+  ▼
+Bot Runtime
+  │
+  ├─ loads environment config
+  ├─ starts Discord client
+  ├─ registers event handlers
+  ├─ loads slash commands
+  ├─ routes interactions
+  ├─ executes module logic
+  └─ writes logs / optional database records
+```
 
-- a **bot runtime** for Discord gateway interactions
-- an **API service** for dashboard and internal operations
-- a **dashboard frontend**
-- one or more **background workers**
-- shared internal **packages** for business logic, contracts, config, permissions, localization, and data access
+The important rule:
 
-### High-Level Flow
+> Keep the project simple, but not messy.
 
-1. A guild installs the bot.
-2. Zen registers runtime capabilities and module availability.
-3. Admins authenticate through Discord OAuth2 on the dashboard.
-4. Guild-scoped configuration is loaded from persistent storage.
-5. Modules execute against validated config and permission rules.
-6. Sensitive actions emit logs and audit events.
-7. Background jobs process asynchronous tasks when needed.
+Zen should avoid two traps:
 
-This separation makes Zen easier to:
+1. **Over-engineering**: starting with a huge monorepo before the bot works.
+2. **Under-engineering**: dumping every command and event into random files with no boundaries.
 
-- maintain
-- test
-- scale
-- self-host
-- extend over time without collapsing into monolithic spaghetti
+The current architecture is the middle ground.
 
 ---
 
-## Workspace Structure
+## Project Structure
 
-Zen is intended to grow as a **pnpm workspace / monorepo**.
+Zen uses a simple `src/` structure.
 
 ```text
 zen/
-├─ apps/
-│  ├─ bot/                  # Discord bot runtime
-│  ├─ api/                  # Backend API for dashboard and internal services
-│  ├─ dashboard/            # Web dashboard frontend
-│  └─ worker/               # Background jobs, queues, scheduled tasks
-│
-├─ packages/
-│  ├─ core/                 # Shared domain logic
-│  ├─ db/                   # Database schema, migrations, repositories
-│  ├─ config/               # Environment parsing and runtime config
-│  ├─ logger/               # Structured logging utilities
-│  ├─ i18n/                 # Localization system and translation keys
-│  ├─ permissions/          # Role/access policy logic
-│  ├─ contracts/            # Shared types, schemas, API contracts
-│  ├─ modules/              # Reusable feature modules
-│  ├─ ui/                   # Shared dashboard UI components
-│  └─ utils/                # Low-level helpers
-│
-├─ services/
-│  └─ music/                # Optional dedicated audio-related service
-│
-├─ infrastructure/
-│  ├─ docker/
-│  ├─ compose/
-│  ├─ monitoring/
-│  ├─ scripts/
-│  └─ reverse-proxy/
-│
-├─ docs/
-│  ├─ architecture/
+├─ src/
+│  ├─ main.ts                     # Application entrypoint
+│  ├─ bot.ts                      # Discord client bootstrap
+│  │
+│  ├─ config/
+│  │  ├─ env.ts                   # Environment parsing and validation
+│  │  └─ index.ts                 # Public config exports
+│  │
+│  ├─ commands/
+│  │  ├─ index.ts                 # Command registry
+│  │  ├─ moderation/
+│  │  │  ├─ ban.ts
+│  │  │  ├─ kick.ts
+│  │  │  └─ timeout.ts
+│  │  ├─ tickets/
+│  │  │  └─ ticket.ts
+│  │  └─ utilities/
+│  │     ├─ ping.ts
+│  │     ├─ server-info.ts
+│  │     └─ user-info.ts
+│  │
+│  ├─ events/
+│  │  ├─ index.ts                 # Event registry
+│  │  ├─ ready.ts
+│  │  ├─ interaction-create.ts
+│  │  ├─ guild-create.ts
+│  │  └─ error.ts
+│  │
 │  ├─ modules/
-│  ├─ deployment/
-│  └─ contributing/
+│  │  ├─ moderation/
+│  │  │  ├─ moderation.service.ts
+│  │  │  ├─ moderation.types.ts
+│  │  │  └─ moderation.policy.ts
+│  │  ├─ tickets/
+│  │  │  ├─ tickets.service.ts
+│  │  │  ├─ tickets.types.ts
+│  │  │  └─ tickets.policy.ts
+│  │  ├─ automod/
+│  │  │  ├─ automod.service.ts
+│  │  │  ├─ automod.rules.ts
+│  │  │  └─ automod.types.ts
+│  │  └─ utilities/
+│  │     └─ utilities.service.ts
+│  │
+│  ├─ services/
+│  │  ├─ logger.ts                # Logging service
+│  │  ├─ discord.ts               # Discord-specific helpers
+│  │  └─ scheduler.ts             # Optional scheduled task helper
+│  │
+│  ├─ db/
+│  │  ├─ client.ts                # Database client, optional in early V1
+│  │  ├─ schema.ts                # Schema definitions
+│  │  └─ repositories/
+│  │     ├─ guild.repository.ts
+│  │     ├─ moderation.repository.ts
+│  │     └─ ticket.repository.ts
+│  │
+│  ├─ lib/
+│  │  ├─ permissions.ts           # Permission helpers
+│  │  ├─ errors.ts                # Shared error classes
+│  │  ├─ embeds.ts                # Embed builders
+│  │  ├─ guards.ts                # Runtime checks
+│  │  └─ time.ts                  # Time/date helpers
+│  │
+│  └─ types/
+│     ├─ command.ts               # Command interfaces
+│     ├─ event.ts                 # Event interfaces
+│     └─ index.ts
+│
+├─ scripts/
+│  ├─ deploy-commands.ts          # Register slash commands
+│  └─ clear-commands.ts           # Optional command cleanup
 │
 ├─ .github/
-├─ pnpm-workspace.yaml
-├─ turbo.json
-├─ package.json
+│  └─ workflows/
+│     └─ ci.yml
+│
 ├─ .env.example
-└─ README.md
+├─ .gitignore
+├─ eslint.config.mjs
+├─ prettier.config.mjs
+├─ package.json
+├─ tsconfig.json
+├─ README.md
+└─ LICENSE
 ```
 
 ### Why this structure
 
-This layout keeps Zen sane as it grows:
+This layout keeps the project simple while still giving it boundaries.
 
-- **apps/** contains runnable services
-- **packages/** contains shared internal building blocks
-- **services/** isolates optional specialized runtimes
-- **infrastructure/** holds deployment and ops concerns
-- **docs/** keeps architecture and contributor documentation separate from code
+- `commands/` contains Discord-facing commands.
+- `events/` contains Discord event handlers.
+- `modules/` contains business logic.
+- `services/` contains technical services.
+- `db/` contains persistence concerns.
+- `lib/` contains reusable helpers.
+- `types/` contains shared TypeScript types.
+- `scripts/` contains one-off operational scripts.
 
-This avoids mixing:
+A command should not contain all the logic.  
+A command should validate input, call a module/service, and return a response.
 
-- command logic
-- persistence
-- dashboard code
-- infrastructure scripts
-- module internals
+That keeps the bot easier to test and easier to refactor later.
 
-inside one giant codebase with no boundaries.
+---
+
+## Command System
+
+Zen uses a slash-first command model.
+
+A command should define:
+
+- name
+- description
+- options
+- permission requirements
+- execution handler
+- error behavior where needed
+
+Example command shape:
+
+```ts
+export interface Command {
+    name: string;
+    description: string;
+
+    execute(context: CommandContext): Promise<void>;
+}
+```
+
+A command should stay thin.
+
+Bad pattern:
+
+```text
+command file
+└─ 300 lines of validation, permissions, database writes, business logic, embeds
+```
+
+Preferred pattern:
+
+```text
+command file
+├─ validate input
+├─ call module/service
+└─ send response
+```
+
+The real logic belongs in `modules/` or `services/`.
+
+---
+
+## Event System
+
+Events are loaded from `src/events`.
+
+Examples:
+
+- `ready`
+- `interactionCreate`
+- `guildCreate`
+- `guildDelete`
+- `messageCreate`
+- `error`
+
+Event handlers should also stay thin.
+
+An event handler should:
+
+- receive the Discord event
+- ignore irrelevant cases early
+- call the correct module/service
+- log errors properly
+- avoid hidden side effects
+
+This keeps runtime behavior easier to debug.
 
 ---
 
 ## Module System
 
-Zen is built around a modular architecture.
+Zen is modular, but not a plugin platform yet.
 
-A module is not just “a folder with commands”.
-A proper Zen module can include several concerns:
+A module is a feature area with clear responsibility.
 
-- runtime commands
-- Discord event handlers
-- config schema
-- validation rules
-- permission requirements
-- persistence needs
-- audit hooks
-- translation keys
-- dashboard settings UI
-- optional background jobs
+Example modules:
 
-### Example module candidates
+- `moderation`
+- `tickets`
+- `automod`
+- `utilities`
+- `roles`
+- `welcome`
+- `reminders`
 
-- moderation
-- automod
-- anti-raid
-- tickets
-- music
-- levels
-- welcome
-- reaction roles
-- utilities
-- reminders
-- polls
-- custom commands
+A module may contain:
+
+- services
+- types
+- policies
+- validators
+- repository usage
+- module-specific config logic
+
+Example:
+
+```text
+src/modules/moderation/
+├─ moderation.service.ts
+├─ moderation.policy.ts
+├─ moderation.types.ts
+└─ moderation.errors.ts
+```
 
 ### Module design principles
 
-- modules should have **clear ownership**
-- modules should expose **explicit capabilities**
-- modules should not bypass shared permission or config systems
-- modules should be **composable**, not tightly coupled
-- module configuration should be validated before activation
-- sensitive behavior should emit auditable events
-
-Long-term, Zen may expose a more formal plugin or extension API.
-But the internal module model must be stable first.
+- one module = one clear responsibility
+- no direct coupling between unrelated modules
+- shared logic goes in `lib/` or `services/`
+- persistence goes through repositories
+- commands call modules, not the opposite
+- permission checks must be explicit
+- sensitive actions should be logged
 
 ---
 
 ## Configuration Model
 
-Zen needs configuration that is both safe and manageable.
+Zen uses environment variables for runtime configuration.
 
-### Configuration layers
+Configuration should be validated at startup.  
+The bot should fail fast if required values are missing.
 
-- **environment configuration**
-  tokens, secrets, service URLs, runtime flags
+### Required environment variables
 
-- **global system configuration**
-  deployment-wide behavior and operational defaults
+```env
+DISCORD_TOKEN=
+DISCORD_CLIENT_ID=
+DISCORD_GUILD_ID=
+NODE_ENV=development
+LOG_LEVEL=info
+```
 
-- **guild configuration**
-  server-specific module settings, language, permissions, thresholds, channels, roles
+### Optional future variables
 
-- **feature flags**
-  controlled rollout of unstable or optional features
+```env
+DATABASE_URL=
+REDIS_URL=
+DEFAULT_LANGUAGE=en
+```
 
 ### Principles
 
-- validated at load time
-- safe defaults
-- per-module config ownership
-- guild-scoped isolation
-- dashboard-safe editing
-- no silent invalid states
-
-A platform like Zen dies quickly if config becomes ambiguous or inconsistent.
-This layer must stay strict.
+- no hardcoded secrets
+- no silent fallback for required secrets
+- clear `.env.example`
+- validation before starting the bot
+- separate development and production behavior
 
 ---
 
 ## Data & Persistence
 
-Zen is designed around a clean persistence model.
+Zen should not start with a heavy database model unless the first features require it.
 
-### Primary storage responsibilities
+### No database needed for early utilities
 
-#### PostgreSQL
+Commands like these do not require persistence:
 
-Used for persistent application state such as:
+- ping
+- server info
+- user info
+- avatar
+- simple embeds
 
-- guild configuration
-- moderation history
-- warnings and cases
+### Database becomes useful for
+
+- moderation cases
+- warnings
 - ticket metadata
-- localization preferences
-- leveling data
-- automation records
-- dashboard-related metadata
+- guild configuration
+- audit logs
+- reminders
+- role menus
+- leveling
 
-#### Redis
+### Recommended direction
 
-Used for ephemeral or operational concerns such as:
+When persistence is needed, use one clear database layer.
 
-- caching
-- rate limiting
-- queueing
-- temporary locks
-- distributed coordination where needed
+Possible stack:
 
-#### Optional object/file storage
+- PostgreSQL for persistent data
+- Prisma or Drizzle for schema and queries
+- migrations committed to the repository
 
-Can be used later for:
-
-- ticket transcripts
-- exported reports
-- generated assets
-- large audit-related artifacts
-
-### Data design priorities
-
-- guild isolation
-- predictable schema evolution
-- migrations under version control
-- minimal ambiguity in ownership
-- support for future analytics without polluting runtime paths
-
----
-
-## Deployment Modes
-
-Zen is intended to scale progressively rather than forcing complex infrastructure on day one.
-
-### 1. Local Development
-
-Recommended for contributors and early development.
-
-Typical services:
-
-- bot
-- PostgreSQL
-- optional dashboard
-- optional Redis
-
-Best for:
-
-- local feature work
-- debugging
-- architecture iteration
-
----
-
-### 2. Single-Node Self-Hosted
-
-Best for personal communities and small to medium servers.
-
-Typical services:
-
-- bot
-- PostgreSQL
-- optional Redis
-- optional dashboard
-
-Best for:
-
-- hobby hosting
-- private communities
-- simple production setups
-
----
-
-### 3. Small Production Deployment
-
-Adds more separation and reliability.
-
-Typical services:
-
-- bot
-- API
-- dashboard
-- PostgreSQL
-- Redis
-
-Best for:
-
-- communities that want safer operations
-- teams with dashboard-based configuration needs
-- cleaner service boundaries
-
----
-
-### 4. Multi-Service Production
-
-Separates background work from core runtime.
-
-Typical services:
-
-- sharded bot workers
-- API
-- dashboard
-- dedicated worker
-- PostgreSQL
-- Redis
-
-Best for:
-
-- larger servers
-- heavier automation
-- better operational isolation
-
----
-
-### 5. Horizontal Scale
-
-For larger deployments and serious production hosting.
-
-Possible additions:
-
-- multiple shard groups
-- queue worker pools
-- dedicated music backend
-- metrics stack
-- alerting stack
-- reverse proxy / ingress layer
-- database tuning and replicas where justified
-
-Zen should be able to grow into this model, but it should not require this complexity to be useful.
+The choice should be made once the first persistent feature is implemented.  
+Do not add a database just to look serious.
 
 ---
 
 ## Security, Privacy & Reliability
 
-Zen is built with a security-first mindset.
+Zen should be strict with moderation and server-management features.
 
 ### Security priorities
 
 - least-privilege bot permissions
-- strict dashboard auth boundaries
-- guild-scoped access validation
-- input validation on command and API boundaries
-- rate limiting for abuse-prone surfaces
-- safe secret handling
-- secure defaults for anti-raid and automod systems
-- auditable handling of sensitive actions
+- explicit permission checks
+- guild-scoped behavior
+- safe command defaults
+- input validation
+- rate limiting for abuse-prone commands
+- no secrets committed to the repository
+- no dangerous owner-only commands without checks
 
 ### Privacy principles
 
-- no unnecessary data collection
-- keep retained data purposeful
+- collect only useful operational data
+- avoid unnecessary user tracking
+- make stored data understandable
+- allow server owners to control bot configuration
 - avoid invasive defaults
-- self-hosting support for communities that want control
-- transparent storage responsibilities
 
 ### Reliability priorities
 
-- explicit module boundaries
-- predictable config validation
-- resilient startup behavior
-- background retry strategy where needed
-- support for health checks and diagnostics
-- architecture that can evolve without constant rewrites
-
----
-
-## Observability & Operations
-
-A platform meant for real communities needs more than commands.
-
-Zen should support operational visibility through:
-
-- structured application logs
-- health check endpoints
-- module-level diagnostics
-- audit events for sensitive actions
-- future metrics for:
-  - command failures
-  - moderation actions
-  - queue health
-  - job retries
-  - API errors
-  - runtime performance
-
-This is not “nice to have”.
-Without visibility, moderation and automation systems become dangerous to operate.
+- fail fast on invalid config
+- log command errors
+- keep command handlers thin
+- avoid global mutable state where possible
+- keep module boundaries clear
+- add tests around critical logic
 
 ---
 
 ## Tech Stack
 
-The exact implementation may evolve, but the intended direction is:
-
-### Core stack
+Current intended stack:
 
 - **TypeScript**
-- **Node.js**
-- **pnpm workspaces**
-- **Turbo** for monorepo task orchestration
-
-### Runtime and platform
-
-- Discord bot runtime
-- REST API backend
-- web dashboard frontend
-- optional worker runtime for async tasks
-
-### Data layer
-
-- **PostgreSQL**
-- **Drizzle ORM**
-- **Redis** for cache / queue / coordination
-
-### Frontend
-
-- dashboard application with shared UI components
-- Discord OAuth2 authentication
-
-### Tooling
-
+- **Node.js LTS**
+- **pnpm**
+- **Discord bot runtime library**
 - **ESLint**
 - **Prettier**
-- testing stack to be defined consistently across apps/packages
-- Docker for local and production-friendly packaging
-- GitHub Actions for CI/CD later
+- **tsx** for local development
+- **tsup** or **esbuild** for production builds
+- **Vitest** for tests when needed
 
-The important point is consistency, not trendy tool collection.
+Optional later:
+
+- **PostgreSQL**
+- **Prisma** or **Drizzle**
+- **Redis**
+- **Docker**
+- **GitHub Actions**
+
+The stack should stay boring and reliable.
+
+Zen does not need a complex toolchain before the bot has useful features.
 
 ---
 
@@ -648,143 +611,219 @@ The important point is consistency, not trendy tool collection.
 
 ### Requirements
 
-- Node.js 25+
-- pnpm 10+
-- PostgreSQL 16+
-- Redis 7+ (recommended for some features)
-- a Discord application and bot token
+- Node.js LTS
+- pnpm
+- a Discord application
+- a Discord bot token
 
-### Quick Start
+### Installation
 
 ```bash
 git clone https://github.com/t-aize/zen.git
 cd zen
 pnpm install
 cp .env.example .env
-# Fill in your Discord / PostgreSQL / Redis credentials
-pnpm db:migrate
-pnpm dev
 ```
 
-### Expected developer workflow
+Fill in `.env`:
 
-Typical local tasks may include:
+```env
+DISCORD_TOKEN=your_bot_token
+DISCORD_CLIENT_ID=your_client_id
+DISCORD_GUILD_ID=your_test_guild_id
+NODE_ENV=development
+LOG_LEVEL=info
+```
+
+### Register slash commands
 
 ```bash
-pnpm lint
-pnpm format
-pnpm test
-pnpm dev
-pnpm build
-pnpm db:migrate
+pnpm commands:deploy
 ```
 
-As the workspace grows, task routing should stay predictable and centralized.
+### Start in development
+
+```bash
+pnpm dev
+```
+
+### Build
+
+```bash
+pnpm build
+```
+
+### Start in production
+
+```bash
+pnpm start
+```
 
 ---
 
-## Docker Compose
+## Scripts
 
-```bash
-cp .env.example .env
-# Fill in DISCORD_TOKEN, DISCORD_CLIENT_ID, DATABASE_URL and Redis settings
-docker compose up --build -d
+Recommended scripts:
+
+```json
+{
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsup src/main.ts --format esm --target node20 --out-dir dist --clean",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "vitest run",
+    "commands:deploy": "tsx scripts/deploy-commands.ts",
+    "commands:clear": "tsx scripts/clear-commands.ts"
+  }
+}
 ```
 
-Typical local Compose stack may include:
-
-- `postgres`
-- `redis`
-- `bot`
-- optional `api`
-- optional `dashboard`
-- optional `worker`
-
-### Notes
-
-- the bot should run migrations safely before startup where appropriate
-- service-to-service networking should use Compose internal hostnames
-- local non-Docker development should remain simple and documented
+Adjust the Node target based on the version used by the project.
 
 ---
 
 ## Roadmap
 
-## Phase 0 — Foundation
+## Phase 0 — Project Foundation
 
-- [ ] workspace setup
-- [ ] shared config package
-- [ ] logging package
-- [ ] database package with migrations
-- [ ] contracts / schema package
-- [ ] i18n foundation
-- [ ] permission model foundation
+- [ ] initialize TypeScript project
+- [ ] configure ESLint
+- [ ] configure Prettier
+- [ ] configure `.env.example`
+- [ ] add typed environment validation
+- [ ] add basic logger
+- [ ] add CI workflow for lint and typecheck
+- [ ] add clean `src/` architecture
 
-## Phase 1 — Core Runtime
+## Phase 1 — Discord Runtime
 
-- [ ] Discord bot bootstrap
-- [ ] slash command system
-- [ ] guild registration and config loading
-- [ ] localization support in runtime
-- [ ] central error handling
-- [ ] audit event pipeline
+- [ ] create Discord client bootstrap
+- [ ] handle `ready` event
+- [ ] add command registry
+- [ ] add event registry
+- [ ] add interaction routing
+- [ ] add central error handling
+- [ ] add slash command deployment script
 
-## Phase 2 — Moderation & Protection
+## Phase 2 — Utility Commands
 
-- [ ] moderation commands
-- [ ] warn/case system
-- [ ] mod logs
-- [ ] anti-spam
-- [ ] anti-link / anti-invite
-- [ ] raid detection and mitigation
+- [ ] `/ping`
+- [ ] `/server-info`
+- [ ] `/user-info`
+- [ ] `/avatar`
+- [ ] basic embed helpers
+- [ ] basic permission helpers
 
-## Phase 3 — Tickets & Support
+## Phase 3 — Moderation V1
 
-- [ ] ticket creation flow
-- [ ] claim / close / reopen flows
-- [ ] transcript export
-- [ ] support role routing
-- [ ] dashboard configuration for ticket panels
+- [ ] `/ban`
+- [ ] `/kick`
+- [ ] `/timeout`
+- [ ] `/unban`
+- [ ] reason support
+- [ ] permission checks
+- [ ] moderation log channel support
+- [ ] basic case model if database is added
 
-## Phase 4 — Dashboard & Admin UX
+## Phase 4 — Tickets V1
 
-- [ ] Discord OAuth2 authentication
-- [ ] guild-scoped admin pages
-- [ ] module configuration UI
-- [ ] safer permission-aware settings editing
-- [ ] dashboard audit/history views
+- [ ] ticket panel command
+- [ ] button-based ticket creation
+- [ ] private ticket channel creation
+- [ ] close ticket action
+- [ ] reopen ticket action
+- [ ] transcript strategy
+- [ ] ticket logs
 
-## Phase 5 — Community Systems
+## Phase 5 — Configuration & Persistence
 
-- [ ] leveling
-- [ ] reward roles
-- [ ] welcome / goodbye
-- [ ] reminders
+- [ ] choose database stack
+- [ ] add guild configuration model
+- [ ] add repositories
+- [ ] add migrations
+- [ ] persist moderation cases
+- [ ] persist ticket metadata
+- [ ] add config commands for admins
+
+## Phase 6 — Automod & Protection
+
+- [ ] anti-spam rules
+- [ ] anti-link rules
+- [ ] anti-invite rules
+- [ ] basic raid detection
+- [ ] lockdown command
+- [ ] configurable thresholds
+
+## Phase 7 — Community Features
+
+- [ ] welcome messages
+- [ ] goodbye messages
 - [ ] reaction roles
-- [ ] lightweight automation tools
+- [ ] role menus
+- [ ] reminders
+- [ ] polls
 
-## Phase 6 — Music & Optional Services
+## Phase 8 — Stabilization
 
-- [ ] music playback system
-- [ ] queue management
-- [ ] optional dedicated audio backend
-- [ ] operational constraints for scale
+- [ ] tests for critical modules
+- [ ] better error messages
+- [ ] production logging
+- [ ] Dockerfile
+- [ ] deployment notes
+- [ ] first stable release
 
-## Phase 7 — Operations & Scale
+---
 
-- [ ] health checks
-- [ ] metrics
-- [ ] worker queues
-- [ ] sharding strategy
-- [ ] deployment docs
-- [ ] CI/CD pipeline
+## Future Monorepo Direction
 
-## Long-Term
+Zen may become a monorepo later, but only when the project has a real reason.
 
-- [ ] public extension or plugin API
-- [ ] analytics surfaces
-- [ ] stronger policy engine
-- [ ] advanced operational tooling
+A monorepo may become justified if Zen adds:
+
+- a web dashboard
+- an API backend
+- shared contracts between bot and API
+- background workers
+- shared UI packages
+- a public plugin system
+- deployment infrastructure
+
+Possible future structure:
+
+```text
+zen/
+├─ apps/
+│  ├─ bot/
+│  ├─ api/
+│  └─ dashboard/
+│
+├─ packages/
+│  ├─ config/
+│  ├─ db/
+│  ├─ contracts/
+│  ├─ permissions/
+│  └─ ui/
+│
+├─ package.json
+├─ pnpm-workspace.yaml
+└─ turbo.json
+```
+
+But this is not the current target.
+
+For now, the correct architecture is:
+
+```text
+one bot
+one package.json
+one src/
+clear modules
+clean execution
+```
 
 ---
 
@@ -794,36 +833,26 @@ Contributions are welcome, but Zen should stay coherent.
 
 ### Contribution expectations
 
-- follow formatting and linting rules
+- follow formatting rules
+- keep command handlers small
+- avoid unrelated changes in one pull request
 - document behavior changes
-- include tests where relevant
-- avoid bypassing shared config / permissions / contracts
-- keep module boundaries explicit
-- discuss major architectural changes before implementation
+- add tests for important logic
+- do not bypass permission helpers
+- do not hardcode guild-specific behavior
+- do not introduce a workspace without a real reason
 
-### For larger changes
+### Larger changes
 
-Please open an issue first if your change affects:
+Open an issue first if the change affects:
 
-- architecture
+- project architecture
 - persistence model
-- auth
-- permissions
-- module contracts
-- public APIs
+- command system
+- permission system
+- moderation behavior
+- public configuration
 - deployment model
-
-### Project standards
-
-Zen aims to be:
-
-- readable
-- modular
-- testable
-- operationally sane
-- serious about maintainability
-
-That means “works on my machine” is not enough.
 
 ---
 
@@ -831,26 +860,32 @@ That means “works on my machine” is not enough.
 
 Zen is being built to be:
 
-- a coherent all-in-one Discord platform
-- self-hostable without premium lock-in
-- modular enough to grow safely
-- maintainable by contributors over time
-- useful for real communities, not just demo servers
-- capable of scaling progressively when justified
+- a useful Discord bot first
+- simple to run locally
+- cleanly structured
+- modular without being over-engineered
+- self-hostable
+- serious about permissions and moderation safety
+- able to evolve into a larger platform later if justified
 
 ---
 
 ## Non-Goals
 
-Zen is **not** trying to be:
+Zen is not currently trying to be:
 
-- a rushed mega-bot with no architecture
-- a premium-bait SaaS clone
-- an over-engineered enterprise system for day one
-- a dependency pile of unrelated features
-- a platform that requires huge infrastructure just to run locally
+- a full Discord platform
+- a dashboard-first product
+- a multi-service monorepo
+- a SaaS
+- a music infrastructure project
+- a public plugin marketplace
+- an enterprise-grade distributed system
+- a bot with every feature added at once
 
-The goal is disciplined growth, not feature vanity.
+Feature quantity is not the priority.
+
+A smaller bot with clean foundations is better than a huge bot that becomes unmaintainable.
 
 ---
 
@@ -864,13 +899,13 @@ Zen is open-source under the **Apache-2.0 License**.
 
 Zen is an independent open-source project and is **not affiliated with Discord** or any third-party bot provider.
 
-It may offer features commonly found across the Discord bot ecosystem, but it is designed as its own platform with its
-own architecture, goals, and implementation.
+It may offer features commonly found across the Discord bot ecosystem, but it is designed as its own bot with its own
+architecture, goals, and implementation.
 
 ---
 
 <div align="center">
 
-### Zen — A serious open-source Discord platform, built to stay maintainable.
+### Zen — A clean Discord bot first. A larger platform later, only if justified.
 
 </div>

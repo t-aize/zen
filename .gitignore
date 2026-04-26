@@ -42,5 +42,3 @@ Thumbs.db
 
 # Package artifacts
 *.tgz
-
-/generated/prisma
