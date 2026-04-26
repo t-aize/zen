@@ -1,7 +1,12 @@
-export function main(): void {
-  const startedAt = new Date().toISOString();
+import { startBot } from './bot.js';
+import { createLogger, flushLogger } from './services/logger.js';
 
-  process.stdout.write(`Zen bot bootstrap ready (${startedAt})\n`);
+const logger = createLogger('bootstrap');
+
+try {
+  await startBot();
+} catch (error) {
+  logger.fatal({ err: error }, 'Failed to start Zen');
+  await flushLogger();
+  process.exitCode = 1;
 }
-
-main();
