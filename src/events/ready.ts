@@ -1,22 +1,25 @@
-import { Events, type Client } from 'discord.js';
+import { Events } from 'discord.js';
 
-import { env } from '../config/env.js';
 import { createLogger } from '../services/logger.js';
-import type { BotEvent } from './types.js';
+import { defineEvent } from './types.js';
 
 const logger = createLogger('events.ready');
 
-export const readyEvent: BotEvent<typeof Events.ClientReady> = {
-  name: Events.ClientReady,
-  once: true,
-  execute(client: Client<true>): void {
+export const readyEvent = defineEvent(
+  Events.ClientReady,
+  (client) => {
+    const user = client.user;
+
     logger.info(
       {
-        clientId: env.DISCORD_CLIENT_ID,
-        userId: client.user.id,
-        username: client.user.tag,
+        userId: user.id,
+        username: user.tag,
+        guildCount: client.guilds.cache.size,
+        shardCount: client.ws.shards.size,
+        readyAt: client.readyAt.toISOString(),
       },
       'Discord client ready',
     );
   },
-};
+  true,
+);
