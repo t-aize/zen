@@ -367,10 +367,10 @@ Example command shape:
 
 ```ts
 export interface Command {
-    name: string;
-    description: string;
+  name: string;
+  description: string;
 
-    execute(context: CommandContext): Promise<void>;
+  execute(context: CommandContext): Promise<void>;
 }
 ```
 
