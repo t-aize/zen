@@ -1,11 +1,11 @@
 import { Events } from 'discord.js';
 
-import { createLogger } from '../services/logger.js';
-import { defineEvent } from './types.js';
+import { createLogger } from '../../services/logger.js';
+import { defineEvent } from '../types.js';
 
-const logger = createLogger('events.ready');
+const logger = createLogger('events.client.ready');
 
-export const readyEvent = defineEvent(
+export const clientReadyEvent = defineEvent(
   Events.ClientReady,
   (client) => {
     const user = client.user;

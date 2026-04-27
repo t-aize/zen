@@ -8,6 +8,7 @@ export const envSchema = z.object({
 
   // Logging
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  LOG_PRETTY: z.boolean().default(true),
 
   // Discord runtime
   DISCORD_TOKEN: z.string().trim().min(1),
@@ -23,4 +24,10 @@ if (!parsedEnv.success) {
   throw new Error(`Invalid environment variables:\n${z.prettifyError(parsedEnv.error)}`);
 }
 
-export const env = parsedEnv.data;
+export const env = {
+  ...parsedEnv.data,
+  LOG_PRETTY:
+    process.env.LOG_PRETTY === undefined
+      ? parsedEnv.data.NODE_ENV !== 'production'
+      : parsedEnv.data.LOG_PRETTY,
+};

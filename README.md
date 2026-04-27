@@ -313,9 +313,6 @@ zen/
 │     └─ index.ts
 │
 ├─ scripts/
-│  ├─ deploy-commands.ts          # Register slash commands
-│  └─ clear-commands.ts           # Optional command cleanup
-│
 ├─ .github/
 │  └─ workflows/
 │     └─ ci.yml
@@ -482,7 +479,7 @@ The bot should fail fast if required values are missing.
 ```env
 DISCORD_TOKEN=
 DISCORD_CLIENT_ID=
-DISCORD_GUILD_ID=
+DISCORD_DEV_GUILD_ID=
 NODE_ENV=development
 LOG_LEVEL=info
 ```
@@ -630,16 +627,12 @@ Fill in `.env`:
 ```env
 DISCORD_TOKEN=your_bot_token
 DISCORD_CLIENT_ID=your_client_id
-DISCORD_GUILD_ID=your_test_guild_id
+DISCORD_DEV_GUILD_ID=your_test_guild_id
 NODE_ENV=development
 LOG_LEVEL=info
 ```
 
-### Register slash commands
-
-```bash
-pnpm commands:deploy
-```
+Slash commands are synchronized automatically when a guild becomes available. If `DISCORD_DEV_GUILD_ID` is set, only that guild is synchronized.
 
 ### Start in development
 
@@ -675,9 +668,7 @@ Recommended scripts:
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "test": "vitest run",
-    "commands:deploy": "tsx scripts/deploy-commands.ts",
-    "commands:clear": "tsx scripts/clear-commands.ts"
+    "test": "vitest run"
   }
 }
 ```

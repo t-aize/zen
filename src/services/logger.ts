@@ -1,9 +1,7 @@
-import pino, { type Logger } from 'pino';
+import pino, { type Logger, type LoggerOptions } from 'pino';
 import { env } from '../config/env.js';
 
-export type LoggerBindings = Record<string, string | number | boolean | null>;
-
-export const logger = pino({
+const loggerOptions: LoggerOptions = {
   base: {
     service: env.APP_NAME,
     environment: env.NODE_ENV,
@@ -34,9 +32,24 @@ export const logger = pino({
     error: pino.stdSerializers.err,
   },
   timestamp: pino.stdTimeFunctions.isoTime,
-});
+};
 
-export function createLogger(scope: string, bindings: LoggerBindings = {}): Logger {
+if (env.LOG_PRETTY) {
+  loggerOptions.transport = {
+    target: 'pino-pretty',
+    options: {
+      colorize: env.NODE_ENV !== 'production',
+      ignore: 'pid,hostname',
+      levelFirst: true,
+      singleLine: false,
+      translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
+    },
+  };
+}
+
+export const logger = pino(loggerOptions);
+
+export function createLogger(scope: string, bindings: LoggerOptions = {}): Logger {
   return logger.child({
     scope,
     ...bindings,
