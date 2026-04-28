@@ -1,44 +1,16 @@
-# Dependencies
 node_modules/
-.pnpm-store/
-
-# Build outputs
 dist/
 build/
 coverage/
-*.tsbuildinfo
-
-# Environment files
 .env
 .env.*
 !.env.example
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Runtime data
-*.pid
-*.seed
-*.pid.lock
-
-# OS / editors
 .DS_Store
-Thumbs.db
 .idea/
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-
-# Tests / cache
-.nyc_output/
-.vitest/
+.vscode/
+*.log
+*.tsbuildinfo
 .eslintcache
 .cache/
-
-# Package artifacts
-*.tgz
+.vitest/
+.pnpm-store/
