@@ -11,6 +11,7 @@ import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './database/prisma.module.js';
 import { EventsModule } from './events/events.module.js';
 import { ModerationModule } from './modules/moderation/moderation.module.js';
+import { TicketsModule } from './modules/tickets/tickets.module.js';
 import { UtilitiesModule } from './modules/utilities/utilities.module.js';
 
 type EnvConfigService = ConfigService<Env, true>;
@@ -69,6 +70,7 @@ type EnvConfigService = ConfigService<Env, true>;
     CommonModule,
     EventsModule,
     ModerationModule,
+    TicketsModule,
     UtilitiesModule,
   ],
 })

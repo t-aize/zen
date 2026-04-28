@@ -8,17 +8,125 @@ datasource db {
 }
 
 model Guild {
-  id        String       @id
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  language  String       @default("en")
-  config    GuildConfig?
+  id           String        @id
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  language     String        @default("en")
+  config       GuildConfig?
+  ticketPanels TicketPanel[]
+  tickets      Ticket[]
 }
 
 model GuildConfig {
   guildId                String  @id
   guild                  Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
   moderationLogChannelId String?
-  ticketCategoryId       String?
   autoModEnabled         Boolean @default(false)
+}
+
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+enum TicketEventType {
+  CREATED
+  CLAIMED
+  UNCLAIMED
+  PARTICIPANT_ADDED
+  PARTICIPANT_REMOVED
+  CLOSED
+  REOPENED
+  TRANSCRIPT_CREATED
+  PANEL_UPDATED
+}
+
+model TicketPanel {
+  id                String    @id @default(cuid())
+  guildId           String
+  guild             Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  name              String
+  description       String?
+  enabled           Boolean   @default(true)
+  channelId         String?
+  messageId         String?
+  categoryId        String?
+  logChannelId      String?
+  staffRoleIds      String[]
+  buttonLabel       String    @default("Open ticket")
+  buttonEmoji       String?
+  channelNameFormat String    @default("ticket-{number}")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+  tickets           Ticket[]
+
+  @@unique([guildId, name])
+  @@unique([channelId, messageId])
+  @@index([guildId])
+  @@index([guildId, enabled])
+}
+
+model Ticket {
+  id                      String              @id @default(cuid())
+  guildId                 String
+  guild                   Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  panelId                 String
+  panel                   TicketPanel         @relation(fields: [panelId], references: [id], onDelete: Restrict)
+  number                  Int
+  status                  TicketStatus        @default(OPEN)
+  channelId               String              @unique
+  creatorId               String
+  claimedById             String?
+  claimedAt               DateTime?
+  closedById              String?
+  closedAt                DateTime?
+  closeReason             String?
+  transcriptUrl           String?
+  transcriptPath          String?
+  transcriptKey           String?
+  transcriptSha256        String?
+  transcriptMessageCount  Int?
+  transcriptGeneratedById String?
+  transcriptGeneratedAt   DateTime?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  deletedAt               DateTime?
+  participants            TicketParticipant[]
+  events                  TicketEvent[]
+
+  @@unique([guildId, number])
+  @@index([guildId, status])
+  @@index([panelId, status])
+  @@index([creatorId])
+  @@index([claimedById])
+}
+
+model TicketParticipant {
+  id        String    @id @default(cuid())
+  ticketId  String
+  ticket    Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  addedById String?
+  addedAt   DateTime  @default(now())
+  removedAt DateTime?
+
+  @@unique([ticketId, userId])
+  @@index([userId])
+}
+
+model TicketEvent {
+  id           String          @id @default(cuid())
+  ticketId     String
+  ticket       Ticket          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  type         TicketEventType
+  actorId      String?
+  targetUserId String?
+  reason       String?
+  metadata     Json?
+  createdAt    DateTime        @default(now())
+
+  @@index([ticketId, createdAt])
+  @@index([type])
+  @@index([actorId])
 }
